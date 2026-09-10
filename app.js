@@ -1,12 +1,11 @@
 /**
  * Claude Community Hub - Client Application
- * Implements Single-Post Reader Architecture:
- * - One post on screen at a time
- * - Sticky navigation toolbar & dropdown selector
- * - Bottom Next/Prev dispatch cards
- * - Left/Right Arrow keyboard shortcuts
- * - Instant search & jump dropdown
- * - Mermaid vector diagram compilation
+ * Expansive Responsive Layout Engine:
+ * - Desktop: Sticky Left Sidebar Index + Wide Responsive Reader Pane (95% width utilization)
+ * - Tablet/Mobile: Responsive single column with quick-jump pills & sticky toolbar
+ * - Instant sidebar search filter
+ * - Keyboard navigation (Left/Right Arrow)
+ * - Dynamic Mermaid compilation
  */
 
 let allPosts = [];
@@ -19,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     theme: document.body.classList.contains('light-theme') ? 'default' : 'dark',
     themeVariables: {
       fontFamily: 'Inter, -apple-system, sans-serif',
-      fontSize: '13px',
+      fontSize: '13.5px',
       primaryColor: '#1e293b',
       primaryTextColor: '#f8fafc',
       primaryBorderColor: '#38bdf8',
@@ -46,13 +45,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentIndex = hashIndex;
   }
 
-  // 5. Initialize Navigation & Render
-  renderNavPills();
+  // 5. Initialize Navigation & Controls
+  renderSidebarList(allPosts);
+  renderMobilePills();
   initDropdown();
   initToolbarButtons();
   initBottomCards();
   initKeyboardNav();
-  initSearch();
+  initSidebarSearch();
 
   // 6. Display active post
   showPost(currentIndex, false);
@@ -161,23 +161,23 @@ ${post.diagram}
     console.warn("Mermaid compile notice:", err);
   }
 
-  // Update UI Controls
+  // Update UI Navigation States
   updateNavigationState();
 
-  // Update URL hash without scrolling
+  // Update URL hash without reload
   history.replaceState(null, null, `#${post.id}`);
 
-  // Scroll to top of article if user clicked next/prev
+  // Scroll to top of article if user navigated
   if (shouldScroll) {
     const toolbar = document.querySelector('.reader-toolbar-sticky');
-    const offset = toolbar ? toolbar.offsetHeight + 60 : 100;
+    const offset = toolbar ? toolbar.offsetHeight + 40 : 80;
     const top = container.getBoundingClientRect().top + window.pageYOffset - offset;
     window.scrollTo({ top, behavior: 'smooth' });
   }
 }
 
 /**
- * Update Nav State (Pills, Counter, Pager Buttons, Bottom Cards)
+ * Update Nav State across Toolbar, Sidebar, and Bottom Cards
  */
 function updateNavigationState() {
   const total = allPosts.length;
@@ -196,12 +196,22 @@ function updateNavigationState() {
   if (prevBtn) prevBtn.disabled = (currentIndex === 0);
   if (nextBtn) nextBtn.disabled = (currentIndex === total - 1);
 
-  // 3. Top pills active state
-  document.querySelectorAll('#levelTabs .tab-btn').forEach((btn, idx) => {
+  // 3. Left Sidebar Active Highlight
+  document.querySelectorAll('.sidebar-item').forEach((item) => {
+    const itemIndex = parseInt(item.getAttribute('data-index'), 10);
+    const isActive = (itemIndex === currentIndex);
+    item.classList.toggle('active', isActive);
+    if (isActive) {
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+
+  // 4. Mobile Pills Active State
+  document.querySelectorAll('#mobileLevelTabs .tab-btn').forEach((btn, idx) => {
     btn.classList.toggle('active', idx === currentIndex);
   });
 
-  // 4. Bottom Next/Prev Navigation Cards
+  // 5. Bottom Next/Prev Navigation Cards
   const prevCard = document.getElementById('footerPrevCard');
   const nextCard = document.getElementById('footerNextCard');
   const prevTitle = document.getElementById('footerPrevTitle');
@@ -225,14 +235,44 @@ function updateNavigationState() {
 }
 
 /**
- * Render Bookmark Pills in Hero
+ * Render Sidebar Dispatch List
  */
-function renderNavPills() {
-  const container = document.getElementById('levelTabs');
+function renderSidebarList(posts) {
+  const listContainer = document.getElementById('sidebarList');
+  const countBadge = document.getElementById('sidebarPostCount');
+  if (!listContainer) return;
+
+  if (countBadge) {
+    countBadge.textContent = `${posts.length} dispatches`;
+  }
+
+  if (posts.length === 0) {
+    listContainer.innerHTML = `<div style="padding: 16px; color: var(--text-muted); font-size: 13px;">No dispatches found</div>`;
+    return;
+  }
+
+  listContainer.innerHTML = posts.map((post) => {
+    const originalIndex = allPosts.findIndex(p => p.id === post.id);
+    const shortLevel = post.level.split(':')[0] || `LEVEL ${originalIndex + 1}`;
+    return `
+      <div class="sidebar-item ${originalIndex === currentIndex ? 'active' : ''}" data-index="${originalIndex}" onclick="showPost(${originalIndex})">
+        <span class="sidebar-item-level">${escapeHtml(shortLevel)}</span>
+        <div class="sidebar-item-title">${escapeHtml(post.title)}</div>
+        <div class="sidebar-item-meta">⏱️ ${escapeHtml(post.readTime)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+/**
+ * Render Mobile / Tablet Level Pills
+ */
+function renderMobilePills() {
+  const container = document.getElementById('mobileLevelTabs');
   if (!container) return;
 
   container.innerHTML = allPosts.map((post, idx) => {
-    const shortLabel = post.level.split(':')[1]?.trim() || post.title.slice(0, 16);
+    const shortLabel = post.level.split(':')[1]?.trim() || post.title.slice(0, 14);
     return `
       <button class="tab-btn ${idx === currentIndex ? 'active' : ''}" onclick="showPost(${idx})">
         <span class="tab-num">L${idx + 1}</span>
@@ -279,7 +319,7 @@ function initToolbarButtons() {
 }
 
 /**
- * Initialize Bottom Cards
+ * Initialize Bottom Navigation Cards
  */
 function initBottomCards() {
   const prevCard = document.getElementById('footerPrevCard');
@@ -303,7 +343,6 @@ function initBottomCards() {
  */
 function initKeyboardNav() {
   window.addEventListener('keydown', (e) => {
-    // Avoid interfering with typing in the search input
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) {
       return;
     }
@@ -323,60 +362,28 @@ function initKeyboardNav() {
 }
 
 /**
- * Search & Jump Dropdown
+ * Sidebar Search & Filter
  */
-function initSearch() {
+function initSidebarSearch() {
   const searchInput = document.getElementById('searchInput');
-  const searchResults = document.getElementById('searchResults');
-  if (!searchInput || !searchResults) return;
+  if (!searchInput) return;
 
   searchInput.addEventListener('input', (e) => {
     const q = e.target.value.toLowerCase().trim();
     if (!q) {
-      searchResults.classList.add('hidden');
-      searchResults.innerHTML = '';
+      renderSidebarList(allPosts);
       return;
     }
 
-    const matches = allPosts
-      .map((p, idx) => ({ post: p, index: idx }))
-      .filter(({ post }) => 
-        post.title.toLowerCase().includes(q) ||
-        post.lead.toLowerCase().includes(q) ||
-        post.level.toLowerCase().includes(q) ||
-        (post.mentalModel && post.mentalModel.text.toLowerCase().includes(q))
-      );
+    const filtered = allPosts.filter(p => 
+      p.title.toLowerCase().includes(q) ||
+      p.lead.toLowerCase().includes(q) ||
+      p.level.toLowerCase().includes(q) ||
+      (p.mentalModel && p.mentalModel.text.toLowerCase().includes(q))
+    );
 
-    if (matches.length === 0) {
-      searchResults.innerHTML = `<div class="search-result-item" style="color: var(--text-muted); cursor: default;">No matching dispatches found</div>`;
-      searchResults.classList.remove('hidden');
-      return;
-    }
-
-    searchResults.innerHTML = matches.map(({ post, index }) => `
-      <div class="search-result-item" onclick="jumpToPost(${index})">
-        <span class="search-item-level">L${index + 1} • ${escapeHtml(post.level)}</span>
-        <div class="search-item-title">${escapeHtml(post.title)}</div>
-      </div>
-    `).join('');
-
-    searchResults.classList.remove('hidden');
+    renderSidebarList(filtered);
   });
-
-  // Close dropdown on outside click
-  document.addEventListener('click', (e) => {
-    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-      searchResults.classList.add('hidden');
-    }
-  });
-}
-
-function jumpToPost(index) {
-  const searchResults = document.getElementById('searchResults');
-  const searchInput = document.getElementById('searchInput');
-  if (searchResults) searchResults.classList.add('hidden');
-  if (searchInput) searchInput.value = '';
-  showPost(index);
 }
 
 function getStatIcon(type) {

@@ -35,34 +35,11 @@
     </div>
   </header>
 
-  <!-- Hero Header -->
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="series-tag">ARCHITECTURAL DISPATCHES • 1 POST AT A TIME</div>
-      <h1 class="hero-title">From Vibe-Prompts to Production Architecture</h1>
-      <p class="hero-subtitle">
-        A deep-dive technical series designed for senior engineers and architects. 
-        Focus on one concept at a time with code, metrics, and actionable takeaways.
-      </p>
-      
-      <!-- Search & Jump Controls -->
-      <div class="search-container">
-        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search or jump to any concept (e.g. XML, prompt caching, loop engineering, circuit breaker)..." />
-        <div id="searchResults" class="search-dropdown hidden"></div>
-      </div>
-
-      <!-- Quick Level Navigation Pills -->
-      <nav class="level-tabs" id="levelTabs">
-        <!-- Rendered dynamically by app.js -->
-      </nav>
-    </div>
-  </section>
-
-  <!-- Sticky Reader Navigation Bar -->
+  <!-- Sticky Reader Navigation Toolbar -->
   <div class="reader-toolbar-sticky">
     <div class="reader-toolbar-inner">
       <button id="prevBtnTop" class="pager-nav-btn" title="Previous Post (or Left Arrow key)">
-        <span class="btn-arrow">←</span> Previous Dispatch
+        <span class="btn-arrow">←</span> Previous
       </button>
       
       <div class="pager-center-status">
@@ -73,28 +50,58 @@
       </div>
 
       <button id="nextBtnTop" class="pager-nav-btn" title="Next Post (or Right Arrow key)">
-        Next Dispatch <span class="btn-arrow">→</span>
+        Next <span class="btn-arrow">→</span>
       </button>
     </div>
   </div>
 
-  <!-- Single Post Content Layout -->
-  <main class="container">
-    <div id="single-post-container" class="single-post-wrapper">
-      <div class="loading-state">Loading architectural dispatch...</div>
-    </div>
+  <!-- Responsive Main Grid (Sidebar Index + Wide Reading Area) -->
+  <main class="app-layout">
+    
+    <!-- Left Sticky Sidebar: Dispatch Index -->
+    <aside class="dispatch-sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">DISPATCH INDEX</span>
+        <span id="sidebarPostCount" class="sidebar-count">5 dispatches</span>
+      </div>
 
-    <!-- Bottom Next / Prev Navigation Cards -->
-    <nav class="post-footer-nav" aria-label="Dispatch navigation">
-      <div id="footerPrevCard" class="nav-card prev-card">
-        <span class="card-hint">← PREVIOUS DISPATCH</span>
-        <span class="card-title" id="footerPrevTitle">-</span>
+      <!-- Quick Search Filter -->
+      <div class="sidebar-search-box">
+        <input type="text" id="searchInput" class="sidebar-input" placeholder="🔍 Search concepts or keywords..." />
       </div>
-      <div id="footerNextCard" class="nav-card next-card">
-        <span class="card-hint">NEXT DISPATCH →</span>
-        <span class="card-title" id="footerNextTitle">-</span>
+
+      <!-- Dynamic Sidebar List -->
+      <nav id="sidebarList" class="sidebar-list" aria-label="Dispatches list">
+        <!-- Rendered dynamically by app.js -->
+      </nav>
+    </aside>
+
+    <!-- Right Primary Pane: Active Dispatch -->
+    <section class="reader-main">
+      
+      <!-- Top Pills for Tablet/Mobile Navigation -->
+      <div class="mobile-pills-container" id="mobileLevelTabs">
+        <!-- Rendered dynamically by app.js for smaller screens -->
       </div>
-    </nav>
+
+      <!-- Active Post Card -->
+      <div id="single-post-container" class="single-post-wrapper">
+        <div class="loading-state">Loading architectural dispatch...</div>
+      </div>
+
+      <!-- Bottom Next / Prev Navigation Cards -->
+      <nav class="post-footer-nav" aria-label="Dispatch navigation">
+        <div id="footerPrevCard" class="nav-card prev-card">
+          <span class="card-hint">← PREVIOUS DISPATCH</span>
+          <span class="card-title" id="footerPrevTitle">-</span>
+        </div>
+        <div id="footerNextCard" class="nav-card next-card">
+          <span class="card-hint">NEXT DISPATCH →</span>
+          <span class="card-title" id="footerNextTitle">-</span>
+        </div>
+      </nav>
+
+    </section>
   </main>
 
   <!-- Footer -->
