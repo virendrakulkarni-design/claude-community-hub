@@ -29,7 +29,7 @@
         <span class="brand-title">Claude Engineering Community</span>
       </div>
       <div class="nav-actions">
-        <span class="curator-tag">⚡ Automated Hub • Updates Every Alt Morning 8:30 AM</span>
+        <span class="curator-tag">⚡ Automated Daily Hub • 8:30 AM IST</span>
         <button id="themeToggle" class="btn-secondary" title="Toggle Light/Dark Theme">🌓 Toggle Theme</button>
       </div>
     </div>
@@ -38,38 +38,70 @@
   <!-- Hero Header -->
   <section class="hero">
     <div class="hero-inner">
-      <div class="series-tag">ADVANCED SERIES • ARCHITECTURAL DISPATCHES</div>
-      <h1 class="hero-title">From Vibe-Prompts to Production Architecture: Mastering Claude at Enterprise Scale</h1>
+      <div class="series-tag">ARCHITECTURAL DISPATCHES • 1 POST AT A TIME</div>
+      <h1 class="hero-title">From Vibe-Prompts to Production Architecture</h1>
       <p class="hero-subtitle">
-        A deep-dive technical series designed for senior engineers, architects, and technical leads. 
-        Each post explains the mental model simply, dives deep into code & telemetry, and provides an actionable takeaway.
+        A deep-dive technical series designed for senior engineers and architects. 
+        Focus on one concept at a time with code, metrics, and actionable takeaways.
       </p>
       
-      <!-- Search and Filter Controls -->
-      <div class="filter-controls">
-        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search concepts (e.g. XML, prompt caching, circuit breaker, loop engineering)..." />
+      <!-- Search & Jump Controls -->
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search or jump to any concept (e.g. XML, prompt caching, loop engineering, circuit breaker)..." />
+        <div id="searchResults" class="search-dropdown hidden"></div>
       </div>
 
-      <!-- Quick Navigation Tabs -->
+      <!-- Quick Level Navigation Pills -->
       <nav class="level-tabs" id="levelTabs">
         <!-- Rendered dynamically by app.js -->
       </nav>
     </div>
   </section>
 
-  <!-- Main Content Layout -->
-  <main class="container">
-    <div id="posts-container">
-      <!-- Dynamically populated by app.js -->
-      <div class="loading-state">Loading latest architectural dispatches...</div>
+  <!-- Sticky Reader Navigation Bar -->
+  <div class="reader-toolbar-sticky">
+    <div class="reader-toolbar-inner">
+      <button id="prevBtnTop" class="pager-nav-btn" title="Previous Post (or Left Arrow key)">
+        <span class="btn-arrow">←</span> Previous Dispatch
+      </button>
+      
+      <div class="pager-center-status">
+        <span id="postCounter" class="counter-badge">Dispatch 1 of 5</span>
+        <select id="postDropdown" class="post-select-menu" aria-label="Jump to dispatch">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <button id="nextBtnTop" class="pager-nav-btn" title="Next Post (or Right Arrow key)">
+        Next Dispatch <span class="btn-arrow">→</span>
+      </button>
     </div>
+  </div>
+
+  <!-- Single Post Content Layout -->
+  <main class="container">
+    <div id="single-post-container" class="single-post-wrapper">
+      <div class="loading-state">Loading architectural dispatch...</div>
+    </div>
+
+    <!-- Bottom Next / Prev Navigation Cards -->
+    <nav class="post-footer-nav" aria-label="Dispatch navigation">
+      <div id="footerPrevCard" class="nav-card prev-card">
+        <span class="card-hint">← PREVIOUS DISPATCH</span>
+        <span class="card-title" id="footerPrevTitle">-</span>
+      </div>
+      <div id="footerNextCard" class="nav-card next-card">
+        <span class="card-hint">NEXT DISPATCH →</span>
+        <span class="card-title" id="footerNextTitle">-</span>
+      </div>
+    </nav>
   </main>
 
   <!-- Footer -->
   <footer class="site-footer">
     <div class="footer-inner">
       <p><strong>Claude Enterprise Architecture Hub</strong> • Curated for Internal Engineering Communities</p>
-      <p class="footer-sub">Tip: Click "Copy Post for Slack / Teams" on any article to paste clean, formatted Markdown directly into your company channels.</p>
+      <p class="footer-sub">Tip: Use your keyboard <strong>← Left</strong> and <strong>Right →</strong> arrow keys to browse between dispatches comfortably.</p>
     </div>
   </footer>
 

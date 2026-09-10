@@ -1,9 +1,16 @@
 /**
  * Claude Community Hub - Client Application
- * Handles dynamic post rendering, search, Mermaid diagram compilation, theme toggles, and Markdown exports.
+ * Implements Single-Post Reader Architecture:
+ * - One post on screen at a time
+ * - Sticky navigation toolbar & dropdown selector
+ * - Bottom Next/Prev dispatch cards
+ * - Left/Right Arrow keyboard shortcuts
+ * - Instant search & jump dropdown
+ * - Mermaid vector diagram compilation
  */
 
 let allPosts = [];
+let currentIndex = 0;
 
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. Initialize Mermaid configuration
@@ -24,27 +31,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 2. Setup Theme
   initTheme();
 
-  // 3. Load Posts Data (Supports both HTTP fetch and direct file:// fallback)
+  // 3. Load Posts Data
   await loadPosts();
 
-  // 4. Render UI
-  renderTabs();
-  renderPosts(allPosts);
-
-  // 5. Setup Search
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase().trim();
-      const filtered = allPosts.filter(p => 
-        p.title.toLowerCase().includes(query) ||
-        p.lead.toLowerCase().includes(query) ||
-        p.level.toLowerCase().includes(query) ||
-        (p.mentalModel && p.mentalModel.text.toLowerCase().includes(query))
-      );
-      renderPosts(filtered);
-    });
+  if (!allPosts || allPosts.length === 0) {
+    document.getElementById('single-post-container').innerHTML = `<div class="empty-state">No dispatches available.</div>`;
+    return;
   }
+
+  // 4. Determine initial post from URL hash (e.g. #post-3)
+  const hash = window.location.hash.replace('#', '');
+  const hashIndex = allPosts.findIndex(p => p.id === hash);
+  if (hashIndex !== -1) {
+    currentIndex = hashIndex;
+  }
+
+  // 5. Initialize Navigation & Render
+  renderNavPills();
+  initDropdown();
+  initToolbarButtons();
+  initBottomCards();
+  initKeyboardNav();
+  initSearch();
+
+  // 6. Display active post
+  showPost(currentIndex, false);
 });
 
 /**
@@ -67,64 +78,18 @@ async function loadPosts() {
 }
 
 /**
- * Render Filter Tabs
+ * Display Single Post at index
  */
-function renderTabs() {
-  const tabsContainer = document.getElementById('levelTabs');
-  if (!tabsContainer) return;
+async function showPost(index, shouldScroll = true) {
+  if (index < 0 || index >= allPosts.length) return;
+  currentIndex = index;
+  const post = allPosts[currentIndex];
 
-  let tabsHtml = `<button class="tab-btn active" data-target="all"><span class="tab-num">ALL</span><span class="tab-label">All Dispatches (${allPosts.length})</span></button>`;
-  
-  allPosts.forEach((post, index) => {
-    const num = `L${index + 1}`;
-    const shortLabel = post.level.split(':')[1]?.trim() || post.title.slice(0, 18) + '...';
-    tabsHtml += `
-      <button class="tab-btn" data-target="${post.id}">
-        <span class="tab-num">${num}</span>
-        <span class="tab-label">${escapeHtml(shortLabel)}</span>
-      </button>
-    `;
-  });
-
-  tabsContainer.innerHTML = tabsHtml;
-
-  // Add click listener
-  tabsContainer.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabsContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const targetId = btn.getAttribute('data-target');
-      if (targetId === 'all') {
-        renderPosts(allPosts);
-      } else {
-        const selected = allPosts.filter(p => p.id === targetId);
-        renderPosts(selected);
-        const targetEl = document.getElementById(targetId);
-        if (targetEl) {
-          window.scrollTo({
-            top: targetEl.getBoundingClientRect().top + window.pageYOffset - 80,
-            behavior: 'smooth'
-          });
-        }
-      }
-    });
-  });
-}
-
-/**
- * Render Posts List
- */
-async function renderPosts(posts) {
-  const container = document.getElementById('posts-container');
+  const container = document.getElementById('single-post-container');
   if (!container) return;
 
-  if (!posts || posts.length === 0) {
-    container.innerHTML = `<div class="empty-state">No architectural dispatches match your search query.</div>`;
-    return;
-  }
-
-  container.innerHTML = posts.map(post => `
+  // Render Post HTML
+  container.innerHTML = `
     <article id="${post.id}" class="post-card">
       <div class="post-header">
         <div class="post-meta">
@@ -185,16 +150,233 @@ ${post.diagram}
         </div>
       </div>
     </article>
-  `).join('');
+  `;
 
-  // Re-run Mermaid parser on the newly injected diagrams
+  // Compile Mermaid Diagram for this post
   try {
     await mermaid.run({
-      nodes: document.querySelectorAll('.mermaid')
+      nodes: container.querySelectorAll('.mermaid')
     });
   } catch (err) {
-    console.warn("Mermaid render error:", err);
+    console.warn("Mermaid compile notice:", err);
   }
+
+  // Update UI Controls
+  updateNavigationState();
+
+  // Update URL hash without scrolling
+  history.replaceState(null, null, `#${post.id}`);
+
+  // Scroll to top of article if user clicked next/prev
+  if (shouldScroll) {
+    const toolbar = document.querySelector('.reader-toolbar-sticky');
+    const offset = toolbar ? toolbar.offsetHeight + 60 : 100;
+    const top = container.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+}
+
+/**
+ * Update Nav State (Pills, Counter, Pager Buttons, Bottom Cards)
+ */
+function updateNavigationState() {
+  const total = allPosts.length;
+  const post = allPosts[currentIndex];
+
+  // 1. Counter badge & Dropdown
+  const counter = document.getElementById('postCounter');
+  if (counter) counter.textContent = `Dispatch ${currentIndex + 1} of ${total}`;
+
+  const dropdown = document.getElementById('postDropdown');
+  if (dropdown) dropdown.value = currentIndex;
+
+  // 2. Toolbar buttons
+  const prevBtn = document.getElementById('prevBtnTop');
+  const nextBtn = document.getElementById('nextBtnTop');
+  if (prevBtn) prevBtn.disabled = (currentIndex === 0);
+  if (nextBtn) nextBtn.disabled = (currentIndex === total - 1);
+
+  // 3. Top pills active state
+  document.querySelectorAll('#levelTabs .tab-btn').forEach((btn, idx) => {
+    btn.classList.toggle('active', idx === currentIndex);
+  });
+
+  // 4. Bottom Next/Prev Navigation Cards
+  const prevCard = document.getElementById('footerPrevCard');
+  const nextCard = document.getElementById('footerNextCard');
+  const prevTitle = document.getElementById('footerPrevTitle');
+  const nextTitle = document.getElementById('footerNextTitle');
+
+  if (currentIndex > 0) {
+    prevCard.classList.remove('disabled');
+    prevTitle.textContent = allPosts[currentIndex - 1].title;
+  } else {
+    prevCard.classList.add('disabled');
+    prevTitle.textContent = "You're at the first dispatch";
+  }
+
+  if (currentIndex < total - 1) {
+    nextCard.classList.remove('disabled');
+    nextTitle.textContent = allPosts[currentIndex + 1].title;
+  } else {
+    nextCard.classList.add('disabled');
+    nextTitle.textContent = "You're at the latest dispatch";
+  }
+}
+
+/**
+ * Render Bookmark Pills in Hero
+ */
+function renderNavPills() {
+  const container = document.getElementById('levelTabs');
+  if (!container) return;
+
+  container.innerHTML = allPosts.map((post, idx) => {
+    const shortLabel = post.level.split(':')[1]?.trim() || post.title.slice(0, 16);
+    return `
+      <button class="tab-btn ${idx === currentIndex ? 'active' : ''}" onclick="showPost(${idx})">
+        <span class="tab-num">L${idx + 1}</span>
+        <span class="tab-label">${escapeHtml(shortLabel)}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+/**
+ * Initialize Dropdown Menu
+ */
+function initDropdown() {
+  const dropdown = document.getElementById('postDropdown');
+  if (!dropdown) return;
+
+  dropdown.innerHTML = allPosts.map((p, idx) => `
+    <option value="${idx}">L${idx + 1}: ${escapeHtml(p.title)}</option>
+  `).join('');
+
+  dropdown.addEventListener('change', (e) => {
+    showPost(parseInt(e.target.value, 10));
+  });
+}
+
+/**
+ * Initialize Toolbar Buttons
+ */
+function initToolbarButtons() {
+  const prevBtn = document.getElementById('prevBtnTop');
+  const nextBtn = document.getElementById('nextBtnTop');
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) showPost(currentIndex - 1);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < allPosts.length - 1) showPost(currentIndex + 1);
+    });
+  }
+}
+
+/**
+ * Initialize Bottom Cards
+ */
+function initBottomCards() {
+  const prevCard = document.getElementById('footerPrevCard');
+  const nextCard = document.getElementById('footerNextCard');
+
+  if (prevCard) {
+    prevCard.addEventListener('click', () => {
+      if (currentIndex > 0) showPost(currentIndex - 1);
+    });
+  }
+
+  if (nextCard) {
+    nextCard.addEventListener('click', () => {
+      if (currentIndex < allPosts.length - 1) showPost(currentIndex + 1);
+    });
+  }
+}
+
+/**
+ * Keyboard Navigation (Left / Right Arrow Keys)
+ */
+function initKeyboardNav() {
+  window.addEventListener('keydown', (e) => {
+    // Avoid interfering with typing in the search input
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) {
+      return;
+    }
+
+    if (e.key === 'ArrowLeft') {
+      if (currentIndex > 0) {
+        showPost(currentIndex - 1);
+        showToast("← Previous Dispatch");
+      }
+    } else if (e.key === 'ArrowRight') {
+      if (currentIndex < allPosts.length - 1) {
+        showPost(currentIndex + 1);
+        showToast("Next Dispatch →");
+      }
+    }
+  });
+}
+
+/**
+ * Search & Jump Dropdown
+ */
+function initSearch() {
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  if (!searchInput || !searchResults) return;
+
+  searchInput.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    if (!q) {
+      searchResults.classList.add('hidden');
+      searchResults.innerHTML = '';
+      return;
+    }
+
+    const matches = allPosts
+      .map((p, idx) => ({ post: p, index: idx }))
+      .filter(({ post }) => 
+        post.title.toLowerCase().includes(q) ||
+        post.lead.toLowerCase().includes(q) ||
+        post.level.toLowerCase().includes(q) ||
+        (post.mentalModel && post.mentalModel.text.toLowerCase().includes(q))
+      );
+
+    if (matches.length === 0) {
+      searchResults.innerHTML = `<div class="search-result-item" style="color: var(--text-muted); cursor: default;">No matching dispatches found</div>`;
+      searchResults.classList.remove('hidden');
+      return;
+    }
+
+    searchResults.innerHTML = matches.map(({ post, index }) => `
+      <div class="search-result-item" onclick="jumpToPost(${index})">
+        <span class="search-item-level">L${index + 1} • ${escapeHtml(post.level)}</span>
+        <div class="search-item-title">${escapeHtml(post.title)}</div>
+      </div>
+    `).join('');
+
+    searchResults.classList.remove('hidden');
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.classList.add('hidden');
+    }
+  });
+}
+
+function jumpToPost(index) {
+  const searchResults = document.getElementById('searchResults');
+  const searchInput = document.getElementById('searchInput');
+  if (searchResults) searchResults.classList.add('hidden');
+  if (searchInput) searchInput.value = '';
+  showPost(index);
 }
 
 function getStatIcon(type) {
@@ -204,20 +386,6 @@ function getStatIcon(type) {
     case 'warning': return '🔥';
     default: return '💡';
   }
-}
-
-/**
- * Toast Notification
- */
-function showToast(message) {
-  const toast = document.getElementById('toast');
-  if (!toast) return;
-  toast.textContent = message;
-  toast.classList.add('show');
-  
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3200);
 }
 
 /**
@@ -240,7 +408,7 @@ function copySnippet(button) {
 }
 
 /**
- * Generate formatted Markdown for Slack / Teams
+ * Copy Post for Slack / Teams / Confluence
  */
 function copyPostMarkdown(postId) {
   const post = allPosts.find(p => p.id === postId);
@@ -273,7 +441,7 @@ ${takeawayText}
 `;
 
   navigator.clipboard.writeText(markdown).then(() => {
-    showToast(`✓ Copied "${post.title.slice(0, 25)}..." ready for Slack/Teams!`);
+    showToast(`✓ Copied "${post.title.slice(0, 22)}..." ready for Slack/Teams!`);
   }).catch(err => {
     console.error("Copy failed: ", err);
   });
@@ -312,7 +480,7 @@ function initTheme() {
       const isLight = document.body.classList.contains('light-theme');
       localStorage.setItem('claude-hub-theme', isLight ? 'light' : 'dark');
       showToast(isLight ? "☀️ Switched to Light Theme" : "🌙 Switched to Dark Theme");
-      renderPosts(allPosts);
+      showPost(currentIndex, false);
     });
   }
 }
