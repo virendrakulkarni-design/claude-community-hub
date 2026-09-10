@@ -1,4 +1,4 @@
-name: Alternate-Day Claude Architectural Publisher
+name: Automated Claude Architectural Publisher
 
 on:
   schedule:
