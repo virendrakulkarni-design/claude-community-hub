@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Architect's Guide to Claude | Engineering Community Hub</title>
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Mermaid.js for architecture diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Top Announcement Bar -->
+  <header class="top-nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <span class="brand-badge">ARCHITECT DISPATCH</span>
+        <span class="brand-title">Claude Engineering Community</span>
+      </div>
+      <div class="nav-actions">
+        <span class="curator-tag">⚡ Automated Hub • Updates Every Alt Morning 8:30 AM</span>
+        <button id="themeToggle" class="btn-secondary" title="Toggle Light/Dark Theme">🌓 Toggle Theme</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="series-tag">ADVANCED SERIES • ARCHITECTURAL DISPATCHES</div>
+      <h1 class="hero-title">From Vibe-Prompts to Production Architecture: Mastering Claude at Enterprise Scale</h1>
+      <p class="hero-subtitle">
+        A deep-dive technical series designed for senior engineers, architects, and technical leads. 
+        Each post explains the mental model simply, dives deep into code & telemetry, and provides an actionable takeaway.
+      </p>
+      
+      <!-- Search and Filter Controls -->
+      <div class="filter-controls">
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search concepts (e.g. XML, prompt caching, circuit breaker, loop engineering)..." />
+      </div>
+
+      <!-- Quick Navigation Tabs -->
+      <nav class="level-tabs" id="levelTabs">
+        <!-- Rendered dynamically by app.js -->
+      </nav>
+    </div>
+  </section>
+
+  <!-- Main Content Layout -->
+  <main class="container">
+    <div id="posts-container">
+      <!-- Dynamically populated by app.js -->
+      <div class="loading-state">Loading latest architectural dispatches...</div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <p><strong>Claude Enterprise Architecture Hub</strong> • Curated for Internal Engineering Communities</p>
+      <p class="footer-sub">Tip: Click "Copy Post for Slack / Teams" on any article to paste clean, formatted Markdown directly into your company channels.</p>
+    </div>
+  </footer>
+
+  <!-- Posts Data (offline and file:// friendly) -->
+  <script src="data/posts.js"></script>
+  <!-- Client Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

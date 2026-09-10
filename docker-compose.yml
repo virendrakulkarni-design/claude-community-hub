@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  claude-hub:
+    build: .
+    container_name: claude-architecture-hub
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production

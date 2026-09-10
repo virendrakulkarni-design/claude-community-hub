@@ -1,0 +1,35 @@
+﻿{
+    "id":  "post-6",
+    "topic":  "Model Context Protocol (MCP)",
+    "level":  "LEVEL 6: ENTERPRISE INTEGRATION",
+    "levelClass":  "level-3",
+    "readTime":  "8 min read",
+    "audience":  "Integration Leads \u0026 API Architects",
+    "title":  "Model Context Protocol (MCP): Why It\u0027s the \u0027USB-C for AI\u0027 and How to Standardize Your Enterprise Tools",
+    "lead":  "Every enterprise is currently writing custom glue code to connect LLMs to Jira, GitHub, Postgres, and Datadog. It\u0027s a maintenance nightmare. Anthropic\u0027s open-standard Model Context Protocol solves this forever.",
+    "stats":  {
+                  "type":  "info",
+                  "title":  "The Integration Scaling Bottleneck:",
+                  "items":  [
+                                "Connecting 10 internal LLM agents to 15 internal services without a protocol requires \u003cstrong\u003e150 bespoke integration adapters\u003c/strong\u003e (O(M × N)).",
+                                "With MCP, tools expose a single JSON-RPC interface. You build 15 MCP servers once, and all 10 agents consume them natively (O(M + N))."
+                            ]
+              },
+    "mentalModel":  {
+                        "title":  "1. The 60-Second Mental Model: USB-C vs Proprietary Dongles",
+                        "text":  "Remember when every phone had a different proprietary charger (Nokia pin, Apple 30-pin, Sony Ericsson flat plug)? You needed a drawer full of dongles.\u003cbr\u003e\u003cbr\u003e\u003cstrong\u003eMCP is the USB-C standard for AI.\u003c/strong\u003e Instead of writing bespoke REST callers, authentication wrappers, and schema converters for every internal LLM, you run an MCP server that speaks a standard JSON-RPC 2.0 protocol. Any client (Claude Desktop, your backend agent, Cursor, IDEs) plugs into it seamlessly."
+                    },
+    "diagram":  "graph LR\n    subgraph Clients [\"MCP Clients\"]\n        C1[\"Internal AI Portal\"]\n        C2[\"Claude Desktop / IDE\"]\n        C3[\"CI/CD Orchestrator\"]\n    end\n    subgraph Protocol [\"MCP Standard (JSON-RPC 2.0)\"]\n        MCP_BUS[\"Standardized Tool \u0026amp; Resource Discovery\"]\n    end\n    subgraph Servers [\"Enterprise MCP Servers\"]\n        S1[\"Postgres MCP Server\"]\n        S2[\"Kubernetes MCP Server\"]\n        S3[\"Splunk / Datadog MCP Server\"]\n    end\n    Clients --\u003e MCP_BUS\n    MCP_BUS --\u003e Servers\n    style MCP_BUS fill:#da7756,stroke:#fff,color:#fff",
+    "diagramCaption":  "Figure 6: Decoupling LLM Clients from Backend Systems with MCP",
+    "codeTitle":  "mcp_server_postgres.py",
+    "codeContent":  "from mcp.server.fastmcp import FastMCP\n\nmcp = FastMCP(\"Enterprise-PostgreSQL-Service\")\n\n@mcp.tool()\ndef execute_readonly_sql(query: str) -\u003e str:\n    \"\"\"Executes a read-only SQL SELECT query against production read-replica.\"\"\"\n    if any(keyword in query.upper() for keyword in [\"DROP\", \"DELETE\", \"INSERT\", \"UPDATE\"]):\n        raise ValueError(\"Write operations strictly prohibited via MCP!\")\n    return db_pool.query_as_json(query)\n\nif __name__ == \"__main__\":\n    mcp.run()",
+    "takeaway":  {
+                     "title":  "🎁 Architect’s \"Monday Morning\" Takeaway",
+                     "items":  [
+                                   "Stop writing custom REST tool calling wrappers in Python/TypeScript.",
+                                   "Expose your enterprise databases, wikis, and issue trackers as FastMCP servers.",
+                                   "Standardize authentication and role-based access control (RBAC) at the MCP layer."
+                               ],
+                     "badge":  "Build tools once as MCP servers; let every model and developer desktop consume them forever."
+                 }
+}
