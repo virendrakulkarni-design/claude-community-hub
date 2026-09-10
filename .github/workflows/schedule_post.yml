@@ -1,10 +1,15 @@
-name: Alternate-Day Claude Architectural Publisher
+name: Daily Claude Architectural Publisher
 
 on:
   schedule:
-    # 03:00 UTC = 8:30 AM IST, every alternate day
-    - cron: '0 3 */2 * *'
-  workflow_dispatch: # Allows manual trigger anytime
+    # Daily at 03:00 UTC = 8:30 AM IST
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      custom_topic:
+        description: 'Suggest custom topic/keyword (e.g. Graph Engineering, Certifications, Multi-Agent)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -17,6 +22,9 @@ concurrency:
 
 jobs:
   publish_and_deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -30,15 +38,35 @@ jobs:
       - name: Install dependencies
         run: pip install anthropic
 
-      - name: Run automated post generator
+      - name: Execute Automated Post Generator
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python scripts/generate_post.py
+          CUSTOM_TOPIC: ${{ github.event.inputs.custom_topic }}
+        run: |
+          if [ -n "$CUSTOM_TOPIC" ]; then
+            echo "🚀 Generating custom suggested topic: $CUSTOM_TOPIC"
+            python scripts/generate_post.py --custom-topic "$CUSTOM_TOPIC"
+          else
+            echo "📅 Generating next scheduled topic from queue"
+            python scripts/generate_post.py
+          fi
 
       - name: Commit and Push Updated Knowledge Base
         run: |
           git config --global user.name "Claude Architecture Bot"
           git config --global user.email "bot@users.noreply.github.com"
           git add data/
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-publish: New architectural dispatch [skip ci]"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-publish: New daily architectural dispatch [skip ci]"
           git push
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
