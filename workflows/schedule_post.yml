@@ -1,17 +1,21 @@
-name: Automated Claude Architectural Publisher
+name: Daily Claude Architectural Publisher
 
 on:
   schedule:
-    # 03:00 UTC = 8:30 AM IST, every alternate day (*/2)
-    - cron: '0 3 */2 * *'
-  workflow_dispatch: # Allows manual 1-click trigger from GitHub Actions tab
+    # Daily at 03:00 UTC = 8:30 AM IST
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      custom_topic:
+        description: 'Suggest custom topic/keyword (e.g. Graph Engineering, Certifications, Multi-Agent)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment
 concurrency:
   group: 'pages'
   cancel-in-progress: true
@@ -31,22 +35,28 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Anthropic SDK
-        run: |
-          pip install anthropic
+      - name: Install dependencies
+        run: pip install anthropic
 
       - name: Execute Automated Post Generator
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CUSTOM_TOPIC: ${{ github.event.inputs.custom_topic }}
         run: |
-          python scripts/generate_post.py
+          if [ -n "$CUSTOM_TOPIC" ]; then
+            echo "🚀 Generating custom suggested topic: $CUSTOM_TOPIC"
+            python scripts/generate_post.py --custom-topic "$CUSTOM_TOPIC"
+          else
+            echo "📅 Generating next scheduled topic from queue"
+            python scripts/generate_post.py
+          fi
 
       - name: Commit and Push Updated Knowledge Base
         run: |
           git config --global user.name "Claude Architecture Bot"
           git config --global user.email "bot@users.noreply.github.com"
           git add data/
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-publish: New Claude architectural dispatch [skip ci]"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-publish: New daily architectural dispatch [skip ci]"
           git push
 
       - name: Setup GitHub Pages
