@@ -1,40 +1,5 @@
 [
   {
-    "id": "post-7",
-    "topic": "Claude Citations API & Verbatim Attribution",
-    "level": "LEVEL 7: ENTERPRISE RAG ARCHITECTURE",
-    "levelClass": "level-3",
-    "readTime": "8 min read",
-    "audience": "Data Architects & AI Engineers",
-    "title": "The Death of RAG Hallucinations: How Claude Citations API Enforces Verbatim Grounding",
-    "lead": "The biggest fear in enterprise RAG is a chatbot confidently inventing a refund policy or legal term that doesn't exist. Anthropic's Citations API forces character-accurate citation grounding under the hood.",
-    "stats": {
-      "type": "danger",
-      "title": "The Enterprise Legal Cost of Ungrounded RAG:",
-      "items": [
-        "<strong>The Air Canada Refund Ruling (Feb 2024):</strong> A Canadian court ruled Air Canada was legally liable to pay damages after its customer chatbot hallucinated a non-existent bereavement refund policy.",
-        "Using character-level citation grounding decreases unsupported claims by <strong>over 84%</strong> compared to traditional vector-similarity prompt injection."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Academic Footnotes with Character Offsets",
-      "text": "When you read a legal contract, you don't trust someone summarizing 'the contract generally says we win.' You demand the exact clause, page number, and paragraph.<br><br><strong>Claude Citations API transforms Claude into an academic researcher.</strong> Instead of just writing prose, Claude attaches exact byte-offset citations referencing the source document segments inside its response payload."
-    },
-    "diagram": "sequenceDiagram\n    autonumber\n    participant App as RAG Orchestrator\n    participant Claude as Claude 3.7 with Citations\n    \n    App->>Claude: Documents (chunks with IDs) + Question\n    Note over Claude: Inspects documents with attention heads<br/>Generates text while linking exact byte slices\n    Claude-->>App: Text response + [cited_text: 'Section 4.2', doc_id: 'contract_99', start: 412, end: 498]\n    Note over App: UI highlights exact sentence in original PDF!",
-    "diagramCaption": "Figure 7: Verbatim Grounding Pipeline with Claude Citations API",
-    "codeTitle": "rag_citations_client.py",
-    "codeContent": "import anthropic\n\nclient = anthropic.Anthropic()\n\nresponse = client.messages.create(\n    model=\"claude-3-7-sonnet-20250219\",\n    max_tokens=2048,\n    messages=[{\n        \"role\": \"user\",\n        \"content\": [\n            {\n                \"type\": \"document\",\n                \"source\": {\n                    \"type\": \"text\",\n                    \"media_type\": \"text/plain\",\n                    \"data\": LEGAL_TOS_DOCUMENT\n                },\n                \"title\": \"Enterprise_TOS_v4.pdf\",\n                \"citations\": {\"enabled\": True}  # 📌 Grounding Flag\n            },\n            {\n                \"type\": \"text\",\n                \"text\": \"What is our liability cap if multi-region sync fails?\"\n            }\n        ]\n    }]\n)\n\nfor block in response.content:\n    if block.type == \"text\":\n        print(\"Answer:\", block.text)\n        for citation in getattr(block, 'citations', []):\n            print(f\"  ↳ Cited '{citation.cited_text}' from {citation.document_title}\")",
-    "takeaway": {
-      "title": "🎁 Architect’s \"Monday Morning\" Takeaway",
-      "items": [
-        "Enable citations on all legal, HR, and compliance RAG endpoints.",
-        "Reject any model output that fails to cite document text for factual assertions.",
-        "Highlight cited byte ranges directly in your customer UI for bulletproof transparency."
-      ],
-      "badge": "Verbatim citations protect your company from chatbot liability and eliminate RAG hallucinations."
-    }
-  },
-  {
     "id": "post-8",
     "topic": "Computer Use & Action Grounding Security",
     "level": "LEVEL 8: OS AUTOMATION & SECURITY",
