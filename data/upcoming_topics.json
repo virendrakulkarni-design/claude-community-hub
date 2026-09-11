@@ -20,12 +20,12 @@
       "title": "1. The 60-Second Mental Model: The VNC Screen Scraper on Steroids",
       "text": "Imagine an ultra-fast virtual machine connected over VNC. Every turn, Claude receives a compressed screenshot of the display, reasons about UI coordinates, and issues primitive actions: <code>mouse_move(x, y)</code>, <code>left_click</code>, <code>type_text</code>, or <code>key_combination</code>.<br><br><strong>Never run Computer Use on an engineer's physical host machine!</strong> It must always run inside an ephemeral Docker container or VM with locked-down networking."
     },
-    "diagram": "graph TD\n    subgraph Host [\"Isolated Infrastructure\"]\n        VM[\"Disposable Ubuntu/X11 Docker Container\"]\n        App[\"Target Legacy ERP / Browser\"]\n    end\n    subgraph Brain [\"Claude 3.7 Vision Engine\"]\n        Coord[\"Coordinate Scaler &amp; Action Predictor\"]\n    end\n    VM -- \"1. Base64 Screenshot (1024x768)\" --> Brain\n    Brain -- \"2. Action: click(x=412, y=180)\" --> VM\n    VM --> App\n    style VM fill:#7f1d1d,stroke:#f87171,color:#fff",
+    "diagram": "graph TD\n subgraph Host [\"Isolated Infrastructure\"]\n VM[\"Disposable Ubuntu/X11 Docker Container\"]\n App[\"Target Legacy ERP / Browser\"]\n end\n subgraph Brain [\"Claude 3.7 Vision Engine\"]\n Coord[\"Coordinate Scaler &amp; Action Predictor\"]\n end\n VM -- \"1. Base64 Screenshot (1024x768)\" --> Brain\n Brain -- \"2. Action: click(x=412, y=180)\" --> VM\n VM --> App\n style VM fill:#7f1d1d,stroke:#f87171,color:#fff",
     "diagramCaption": "Figure 8: Sandboxed Execution Architecture for GUI Automation",
     "codeTitle": "computer_use_guard.py",
-    "codeContent": "# Always validate coordinate bounds and action safety\ndef validate_gui_action(action_type, coordinate, blocked_zones):\n    x, y = coordinate\n    for zone in blocked_zones:\n        # E.g. block taskbar, shutdown button, or private keys area\n        if zone['x1'] <= x <= zone['x2'] and zone['y1'] <= y <= zone['y2']:\n            raise SecurityException(f\"Attempted click in protected OS region: ({x}, {y})\")\n    return True",
+    "codeContent": "# Always validate coordinate bounds and action safety\ndef validate_gui_action(action_type, coordinate, blocked_zones):\n x, y = coordinate\n for zone in blocked_zones:\n # E.g. block taskbar, shutdown button, or private keys area\n if zone['x1'] <= x <= zone['x2'] and zone['y1'] <= y <= zone['y2']:\n raise SecurityException(f\"Attempted click in protected OS region: ({x}, {y})\")\n return True",
     "takeaway": {
-      "title": "🎁 Architect’s \"Monday Morning\" Takeaway",
+      "title": "Key Takeaways",
       "items": [
         "Isolate Computer Use workloads inside disposable virtual machines with read-only filesystems.",
         "Enforce coordinate guardrails to prevent clicking OS critical zones.",
@@ -55,12 +55,12 @@
       "title": "1. The 60-Second Mental Model: Video Streaming vs. Complete File Downloads",
       "text": "When you watch Netflix, your browser doesn't wait to download the entire 4GB movie before playing minute 1. It buffers and streams chunks.<br><br><strong>Streaming Tool Calls apply this exact streaming logic to LLM functions.</strong> As Claude emits the first few keys of a tool input JSON, your frontend starts rendering the skeleton loader immediately."
     },
-    "diagram": "sequenceDiagram\n    actor User\n    participant Gateway as SSE Gateway\n    participant Claude as Claude 3.7 Streamer\n    \n    User->>Gateway: Submit complex query\n    Gateway->>Claude: Stream request (stream=True)\n    Claude-->>Gateway: Event: text_delta ('Searching database...')\n    Gateway-->>User: Render live indicator (120ms!)\n    Claude-->>Gateway: Event: input_json_delta (partial tool args)\n    Gateway-->>User: Progressively render tool payload\n    Claude-->>Gateway: Event: message_stop\n    Gateway-->>User: Complete",
+    "diagram": "sequenceDiagram\n actor User\n participant Gateway as SSE Gateway\n participant Claude as Claude 3.7 Streamer\n \n User->>Gateway: Submit complex query\n Gateway->>Claude: Stream request (stream=True)\n Claude-->>Gateway: Event: text_delta ('Searching database...')\n Gateway-->>User: Render live indicator (120ms!)\n Claude-->>Gateway: Event: input_json_delta (partial tool args)\n Gateway-->>User: Progressively render tool payload\n Claude-->>Gateway: Event: message_stop\n Gateway-->>User: Complete",
     "diagramCaption": "Figure 9: End-to-End SSE Streaming with Partial JSON Parsing",
     "codeTitle": "streaming_tool_consumer.py",
-    "codeContent": "with client.messages.stream(\n    model=\"claude-3-7-sonnet-20250219\",\n    max_tokens=2048,\n    tools=MY_TOOLS,\n    messages=[{\"role\": \"user\", \"content\": \"Analyze Q3 revenues\"}]\n) as stream:\n    for event in stream:\n        if event.type == \"text\":\n            yield f\"data: {event.text}\\n\\n\"\n        elif event.type == \"input_json\":\n            yield f\"data: [TOOL_DELTA] {event.partial_json}\\n\\n\"",
+    "codeContent": "with client.messages.stream(\n model=\"claude-3-7-sonnet-20250219\",\n max_tokens=2048,\n tools=MY_TOOLS,\n messages=[{\"role\": \"user\", \"content\": \"Analyze Q3 revenues\"}]\n) as stream:\n for event in stream:\n if event.type == \"text\":\n yield f\"data: {event.text}\\n\\n\"\n elif event.type == \"input_json\":\n yield f\"data: [TOOL_DELTA] {event.partial_json}\\n\\n\"",
     "takeaway": {
-      "title": "🎁 Architect’s \"Monday Morning\" Takeaway",
+      "title": "Key Takeaways",
       "items": [
         "Never make users stare at a blank loading spinner on long reasoning queries.",
         "Stream text deltas to the frontend via Server-Sent Events (SSE).",
@@ -90,12 +90,12 @@
       "title": "1. The 60-Second Mental Model: Unit Tests with Semantic Rubrics",
       "text": "In traditional software, you write unit tests: <code>assert add(2, 2) == 4</code>. But LLM responses are non-deterministic prose.<br><br><strong>LLM-as-a-Judge replaces rigid equality checks with structured scoring rubrics.</strong> Claude evaluates output against 4 deterministic dimensions: Faithfulness, Completeness, Conciseness, and Guardrail Adherence."
     },
-    "diagram": "graph TD\n    PR[\"Engineer opens PR: Prompt v2.1\"]\n    PR --> Runner[\"GitHub Actions Runner\"]\n    Runner --> Batch[\"Execute 50 Golden Test Cases\"]\n    Batch --> Judge[\"Claude Haiku Judge Agent<br/>Scores 1-5 on Semantic Rubric\"]\n    Judge --> Check{\"Mean Score >= 4.5 &amp; Zero Violations?\"}\n    Check -- \"YES\" --> Pass[\"✅ PR Checks Green\"]\n    Check -- \"NO\" --> Block[\"❌ Block PR with Regression Diff\"]\n    style Pass fill:#065f46,stroke:#34d399,color:#fff\n    style Block fill:#7f1d1d,stroke:#f87171,color:#fff",
+    "diagram": "graph TD\n PR[\"Engineer opens PR: Prompt v2.1\"]\n PR --> Runner[\"GitHub Actions Runner\"]\n Runner --> Batch[\"Execute 50 Golden Test Cases\"]\n Batch --> Judge[\"Claude Haiku Judge Agent<br/>Scores 1-5 on Semantic Rubric\"]\n Judge --> Check{\"Mean Score >= 4.5 &amp; Zero Violations?\"}\n Check -- \"YES\" --> Pass[\" PR Checks Green\"]\n Check -- \"NO\" --> Block[\" Block PR with Regression Diff\"]\n style Pass fill:#065f46,stroke:#34d399,color:#fff\n style Block fill:#7f1d1d,stroke:#f87171,color:#fff",
     "diagramCaption": "Figure 10: Automated Semantic Regression Pipeline in CI/CD",
     "codeTitle": "eval_judge_rubric.py",
     "codeContent": "JUDGE_RUBRIC = \"\"\"\nEvaluate the generated answer against the ground truth. Score from 1 to 5 on:\n1. Factual Consistency (No hallucinations)\n2. Policy Compliance (No disallowed actions)\n3. Conciseness (Zero unnecessary fluff)\nOutput XML: <verdict><score>X</score><reason>Y</reason></verdict>\n\"\"\"",
     "takeaway": {
-      "title": "🎁 Architect’s \"Monday Morning\" Takeaway",
+      "title": "Key Takeaways",
       "items": [
         "Curate a 'Golden Dataset' of 50 edge cases from real production logs.",
         "Block PRs that degrade semantic eval scores below baseline thresholds.",

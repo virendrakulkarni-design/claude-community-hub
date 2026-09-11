@@ -41,7 +41,7 @@ $newEntry = [PSCustomObject]@{
     codeTitle = "enterprise_scaffold.py"
     codeContent = "# Production Architecture Implementation for $Topic`n# Enforce XML validation and structured contracts across execution boundaries."
     takeaway = [PSCustomObject]@{
-        title = "🎁 Architect's 'Monday Morning' Takeaway"
+        title = "Key Takeaways"
         items = @(
             "Incorporate $Topic principles into prompt design reviews.",
             "Establish automated evaluation baselines before releasing to production."
