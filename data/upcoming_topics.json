@@ -1,40 +1,5 @@
 [
   {
-    "id": "post-9",
-    "topic": "Streaming Tool Calls & Sub-Second Latency",
-    "level": "LEVEL 9: REAL-TIME SYSTEMS",
-    "levelClass": "level-3",
-    "readTime": "7 min read",
-    "audience": "Frontend & Full-Stack Architects",
-    "title": "Streaming Tool Calls: How to Stream Partial JSON and Deliver Sub-Second UIs",
-    "lead": "Waiting 4 seconds for an LLM to generate a full JSON payload before executing an API call kills user experience. Here is how to parse streaming chunks on the fly.",
-    "stats": {
-      "type": "success",
-      "title": "The UX Impact of Streaming Execution:",
-      "items": [
-        "Perceived latency drops from <strong>3,800ms down to 420ms</strong> when intermediate thinking and partial tool calls are rendered progressively via Server-Sent Events (SSE).",
-        "Users rate streaming interfaces <strong>3.2x more trustworthy</strong> than blank loading spinners."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Video Streaming vs. Complete File Downloads",
-      "text": "When you watch Netflix, your browser doesn't wait to download the entire 4GB movie before playing minute 1. It buffers and streams chunks.<br><br><strong>Streaming Tool Calls apply this exact streaming logic to LLM functions.</strong> As Claude emits the first few keys of a tool input JSON, your frontend starts rendering the skeleton loader immediately."
-    },
-    "diagram": "sequenceDiagram\n actor User\n participant Gateway as SSE Gateway\n participant Claude as Claude 3.7 Streamer\n \n User->>Gateway: Submit complex query\n Gateway->>Claude: Stream request (stream=True)\n Claude-->>Gateway: Event: text_delta ('Searching database...')\n Gateway-->>User: Render live indicator (120ms!)\n Claude-->>Gateway: Event: input_json_delta (partial tool args)\n Gateway-->>User: Progressively render tool payload\n Claude-->>Gateway: Event: message_stop\n Gateway-->>User: Complete",
-    "diagramCaption": "Figure 9: End-to-End SSE Streaming with Partial JSON Parsing",
-    "codeTitle": "streaming_tool_consumer.py",
-    "codeContent": "with client.messages.stream(\n model=\"claude-3-7-sonnet-20250219\",\n max_tokens=2048,\n tools=MY_TOOLS,\n messages=[{\"role\": \"user\", \"content\": \"Analyze Q3 revenues\"}]\n) as stream:\n for event in stream:\n if event.type == \"text\":\n yield f\"data: {event.text}\\n\\n\"\n elif event.type == \"input_json\":\n yield f\"data: [TOOL_DELTA] {event.partial_json}\\n\\n\"",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Never make users stare at a blank loading spinner on long reasoning queries.",
-        "Stream text deltas to the frontend via Server-Sent Events (SSE).",
-        "Render tool call intent before the tool finishes executing to keep the UI engaging."
-      ],
-      "badge": "Sub-second perceived latency turns enterprise AI tools into addictive daily workflows."
-    }
-  },
-  {
     "id": "post-10",
     "topic": "LLM-as-a-Judge in CI/CD",
     "level": "LEVEL 10: AI QUALITY & EVALS",
