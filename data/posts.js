@@ -249,5 +249,41 @@ window.POSTS_DATA = [
       "badge": "Verbatim citations protect your company from chatbot liability and eliminate RAG hallucinations."
     },
     "publishedAt": "2026-09-11 07:43 UTC"
+  },
+  {
+    "id": "post-8",
+    "topic": "Computer Use & Action Grounding Security",
+    "level": "LEVEL 8: OS AUTOMATION & SECURITY",
+    "levelClass": "level-4",
+    "readTime": "10 min read",
+    "audience": "Security Architects & Platform Leads",
+    "title": "Computer Use Architecture: How Claude Controls Desktops and How to Sandbox It",
+    "lead": "Giving an LLM access to a mouse and keyboard sounds like science fiction—until you realize it can click the wrong button in production. Here is how Claude's Computer Use API works and how to sandbox it.",
+    "stats": {
+      "type": "warning",
+      "title": "The Threat Landscape of GUI-Driven Agents:",
+      "items": [
+        "Traditional API-based agents only act on systems with REST endpoints. GUI agents can manipulate <strong>100% of legacy Windows and Linux applications</strong>.",
+        "Prompt injection via browser screenshots (Prompt Injection via Vision) is real: an adversarial webpage can display hidden text telling Claude to delete system files."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: The VNC Screen Scraper on Steroids",
+      "text": "Imagine an ultra-fast virtual machine connected over VNC. Every turn, Claude receives a compressed screenshot of the display, reasons about UI coordinates, and issues primitive actions: <code>mouse_move(x, y)</code>, <code>left_click</code>, <code>type_text</code>, or <code>key_combination</code>.<br><br><strong>Never run Computer Use on an engineer's physical host machine!</strong> It must always run inside an ephemeral Docker container or VM with locked-down networking."
+    },
+    "diagram": "graph TD\n subgraph Host [\"Isolated Infrastructure\"]\n VM[\"Disposable Ubuntu/X11 Docker Container\"]\n App[\"Target Legacy ERP / Browser\"]\n end\n subgraph Brain [\"Claude 3.7 Vision Engine\"]\n Coord[\"Coordinate Scaler &amp; Action Predictor\"]\n end\n VM -- \"1. Base64 Screenshot (1024x768)\" --> Brain\n Brain -- \"2. Action: click(x=412, y=180)\" --> VM\n VM --> App\n style VM fill:#7f1d1d,stroke:#f87171,color:#fff",
+    "diagramCaption": "Figure 8: Sandboxed Execution Architecture for GUI Automation",
+    "codeTitle": "computer_use_guard.py",
+    "codeContent": "# Always validate coordinate bounds and action safety\ndef validate_gui_action(action_type, coordinate, blocked_zones):\n x, y = coordinate\n for zone in blocked_zones:\n # E.g. block taskbar, shutdown button, or private keys area\n if zone['x1'] <= x <= zone['x2'] and zone['y1'] <= y <= zone['y2']:\n raise SecurityException(f\"Attempted click in protected OS region: ({x}, {y})\")\n return True",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Isolate Computer Use workloads inside disposable virtual machines with read-only filesystems.",
+        "Enforce coordinate guardrails to prevent clicking OS critical zones.",
+        "Keep humans in the loop for actions involving money, credentials, or deletion."
+      ],
+      "badge": "GUI agents unlock legacy app automation, but isolation is your only defense against visual prompt injection."
+    },
+    "publishedAt": "2026-09-11 21:11 UTC"
   }
 ];
