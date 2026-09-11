@@ -1,6 +1,6 @@
 # The Architect's Guide to Claude | Community Knowledge Hub
 
-[![Hub Visitors](https://komarev.com/ghpvc/?username=virendrakulkarni-claude-community-hub&label=Hub+Visitors&color=6366f1&style=flat-square)](https://github.com/virendrakulkarni-design/claude-community-hub)
+[![Hub Visitors](https://hits.sh/virendrakulkarni-design.github.io/claude-community-hub.svg?label=Hub+Visitors&color=da7756)](https://github.com/virendrakulkarni-design/claude-community-hub)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A high-impact, data-driven engineering blog and community dispatch hub built for enterprise technical architects and senior engineers.
