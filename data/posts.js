@@ -357,5 +357,41 @@ window.POSTS_DATA = [
       "badge": "Treat prompt changes with the same rigor as database migrations: test before merging."
     },
     "publishedAt": "2026-09-12 01:15 UTC"
+  },
+  {
+    "topic": "Context Compaction & Sliding Window Memory",
+    "level": "LEVEL 11: CONTEXT ARCHITECTURE",
+    "levelClass": "level-3",
+    "readTime": "8 min read",
+    "audience": "Senior Systems Engineers",
+    "title": "Context Compaction: Managing 100k Token Conversations Without State Degradation",
+    "lead": "Extended context windows introduce cost and latency penalties if history grows unbounded. Semantic compaction preserves essential state while discarding ephemeral tokens.",
+    "stats": {
+      "type": "warning",
+      "title": "Memory Explosion Metrics:",
+      "items": [
+        "Uncompacted 20-turn chat conversations consume over 120,000 tokens and slow down response time by 4.2x.",
+        "Asynchronous context compaction drops active turn tokens by 78% while preserving 99% of key entity constraints."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: OS Virtual Memory Paging",
+      "text": "Operating systems swap inactive memory pages to disk rather than keeping all RAM dirty and active.<br><br><strong>Context Compaction applies memory paging to LLMs:</strong> Older turns are summarized into a dense state object, while recent turns remain verbatim."
+    },
+    "diagram": "graph LR\n T1[\"Turns 1-15 (Raw History)\"] --> Summarizer[\"Async Compactor Agent\"]\n Summarizer --> State[\"&lt;session_state&gt;<br/>Key facts, variables, decisions\"]\n State --> Active[\"Turns 16-20 (Recent Raw Turns)\"]\n Active --> Next[\"Next Generation Turn\"]\n style State fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Hybrid Sliding Window Memory Compaction",
+    "codeTitle": "context_compactor.py",
+    "codeContent": "# Periodically condense older chat history\ndef compact_history(history_messages):\n if len(history_messages) > 12:\n condensed_state = summarize_turns(history_messages[:-4])\n return [{'role': 'user', 'content': f'<session_state>{condensed_state}</session_state>'}] + history_messages[-4:]\n return history_messages",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Bound conversational history growth in enterprise agent applications.",
+        "Implement sliding window compaction: summarize older turns into structured XML state.",
+        "Retain key user variables and decisions in a dedicated state scratchpad."
+      ],
+      "badge": "Active context compaction prevents attention degradation and reduces multi-turn costs by 70%."
+    },
+    "id": "post-11",
+    "publishedAt": "2026-09-12 05:55 UTC"
   }
 ];
