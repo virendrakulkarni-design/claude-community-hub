@@ -320,5 +320,41 @@
       "badge": "Sub-second perceived latency turns enterprise AI tools into addictive daily workflows."
     },
     "publishedAt": "2026-09-11 23:18 UTC"
+  },
+  {
+    "id": "post-10",
+    "topic": "LLM-as-a-Judge in CI/CD",
+    "level": "LEVEL 10: AI QUALITY & EVALS",
+    "levelClass": "level-3",
+    "readTime": "8 min read",
+    "audience": "QA, DevOps & Platform Architects",
+    "title": "Ditching the Vibe Check: Automating LLM-as-a-Judge in Your CI/CD Pipeline",
+    "lead": "If your team tests prompt changes by typing 3 queries into the playground and saying 'looks good to me', you have a production incident waiting to happen. Here is how to build automated eval suites in GitHub Actions.",
+    "stats": {
+      "type": "info",
+      "title": "The Engineering Reality of Prompt Regression:",
+      "items": [
+        "Over 65% of prompt updates intended to fix edge case A accidentally introduce regressions in edge case B.",
+        "Running a 100-case automated eval suite with Claude 3.5 Haiku as judge costs less than <strong>$0.12 per pull request</strong> and catches 94% of regressions."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Unit Tests with Semantic Rubrics",
+      "text": "In traditional software, you write unit tests: <code>assert add(2, 2) == 4</code>. But LLM responses are non-deterministic prose.<br><br><strong>LLM-as-a-Judge replaces rigid equality checks with structured scoring rubrics.</strong> Claude evaluates output against 4 deterministic dimensions: Faithfulness, Completeness, Conciseness, and Guardrail Adherence."
+    },
+    "diagram": "graph TD\n PR[\"Engineer opens PR: Prompt v2.1\"]\n PR --> Runner[\"GitHub Actions Runner\"]\n Runner --> Batch[\"Execute 50 Golden Test Cases\"]\n Batch --> Judge[\"Claude Haiku Judge Agent<br/>Scores 1-5 on Semantic Rubric\"]\n Judge --> Check{\"Mean Score >= 4.5 &amp; Zero Violations?\"}\n Check -- \"YES\" --> Pass[\" PR Checks Green\"]\n Check -- \"NO\" --> Block[\" Block PR with Regression Diff\"]\n style Pass fill:#065f46,stroke:#34d399,color:#fff\n style Block fill:#7f1d1d,stroke:#f87171,color:#fff",
+    "diagramCaption": "Figure 10: Automated Semantic Regression Pipeline in CI/CD",
+    "codeTitle": "eval_judge_rubric.py",
+    "codeContent": "JUDGE_RUBRIC = \"\"\"\nEvaluate the generated answer against the ground truth. Score from 1 to 5 on:\n1. Factual Consistency (No hallucinations)\n2. Policy Compliance (No disallowed actions)\n3. Conciseness (Zero unnecessary fluff)\nOutput XML: <verdict><score>X</score><reason>Y</reason></verdict>\n\"\"\"",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Curate a 'Golden Dataset' of 50 edge cases from real production logs.",
+        "Block PRs that degrade semantic eval scores below baseline thresholds.",
+        "Use faster, cheaper models (like Haiku) as your automated CI/CD evaluators."
+      ],
+      "badge": "Treat prompt changes with the same rigor as database migrations: test before merging."
+    },
+    "publishedAt": "2026-09-12 01:15 UTC"
   }
 ]

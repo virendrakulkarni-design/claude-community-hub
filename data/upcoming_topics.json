@@ -1,37 +1,36 @@
 [
   {
-    "id": "post-10",
-    "topic": "LLM-as-a-Judge in CI/CD",
-    "level": "LEVEL 10: AI QUALITY & EVALS",
+    "topic": "Context Compaction & Sliding Window Memory",
+    "level": "LEVEL 11: CONTEXT ARCHITECTURE",
     "levelClass": "level-3",
     "readTime": "8 min read",
-    "audience": "QA, DevOps & Platform Architects",
-    "title": "Ditching the Vibe Check: Automating LLM-as-a-Judge in Your CI/CD Pipeline",
-    "lead": "If your team tests prompt changes by typing 3 queries into the playground and saying 'looks good to me', you have a production incident waiting to happen. Here is how to build automated eval suites in GitHub Actions.",
+    "audience": "Senior Systems Engineers",
+    "title": "Context Compaction: Managing 100k Token Conversations Without State Degradation",
+    "lead": "Extended context windows introduce cost and latency penalties if history grows unbounded. Semantic compaction preserves essential state while discarding ephemeral tokens.",
     "stats": {
-      "type": "info",
-      "title": "The Engineering Reality of Prompt Regression:",
+      "type": "warning",
+      "title": "Memory Explosion Metrics:",
       "items": [
-        "Over 65% of prompt updates intended to fix edge case A accidentally introduce regressions in edge case B.",
-        "Running a 100-case automated eval suite with Claude 3.5 Haiku as judge costs less than <strong>$0.12 per pull request</strong> and catches 94% of regressions."
+        "Uncompacted 20-turn chat conversations consume over 120,000 tokens and slow down response time by 4.2x.",
+        "Asynchronous context compaction drops active turn tokens by 78% while preserving 99% of key entity constraints."
       ]
     },
     "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Unit Tests with Semantic Rubrics",
-      "text": "In traditional software, you write unit tests: <code>assert add(2, 2) == 4</code>. But LLM responses are non-deterministic prose.<br><br><strong>LLM-as-a-Judge replaces rigid equality checks with structured scoring rubrics.</strong> Claude evaluates output against 4 deterministic dimensions: Faithfulness, Completeness, Conciseness, and Guardrail Adherence."
+      "title": "1. The 60-Second Mental Model: OS Virtual Memory Paging",
+      "text": "Operating systems swap inactive memory pages to disk rather than keeping all RAM dirty and active.<br><br><strong>Context Compaction applies memory paging to LLMs:</strong> Older turns are summarized into a dense state object, while recent turns remain verbatim."
     },
-    "diagram": "graph TD\n PR[\"Engineer opens PR: Prompt v2.1\"]\n PR --> Runner[\"GitHub Actions Runner\"]\n Runner --> Batch[\"Execute 50 Golden Test Cases\"]\n Batch --> Judge[\"Claude Haiku Judge Agent<br/>Scores 1-5 on Semantic Rubric\"]\n Judge --> Check{\"Mean Score >= 4.5 &amp; Zero Violations?\"}\n Check -- \"YES\" --> Pass[\" PR Checks Green\"]\n Check -- \"NO\" --> Block[\" Block PR with Regression Diff\"]\n style Pass fill:#065f46,stroke:#34d399,color:#fff\n style Block fill:#7f1d1d,stroke:#f87171,color:#fff",
-    "diagramCaption": "Figure 10: Automated Semantic Regression Pipeline in CI/CD",
-    "codeTitle": "eval_judge_rubric.py",
-    "codeContent": "JUDGE_RUBRIC = \"\"\"\nEvaluate the generated answer against the ground truth. Score from 1 to 5 on:\n1. Factual Consistency (No hallucinations)\n2. Policy Compliance (No disallowed actions)\n3. Conciseness (Zero unnecessary fluff)\nOutput XML: <verdict><score>X</score><reason>Y</reason></verdict>\n\"\"\"",
+    "diagram": "graph LR\n T1[\"Turns 1-15 (Raw History)\"] --> Summarizer[\"Async Compactor Agent\"]\n Summarizer --> State[\"&lt;session_state&gt;<br/>Key facts, variables, decisions\"]\n State --> Active[\"Turns 16-20 (Recent Raw Turns)\"]\n Active --> Next[\"Next Generation Turn\"]\n style State fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Hybrid Sliding Window Memory Compaction",
+    "codeTitle": "context_compactor.py",
+    "codeContent": "# Periodically condense older chat history\ndef compact_history(history_messages):\n if len(history_messages) > 12:\n condensed_state = summarize_turns(history_messages[:-4])\n return [{'role': 'user', 'content': f'<session_state>{condensed_state}</session_state>'}] + history_messages[-4:]\n return history_messages",
     "takeaway": {
       "title": "Key Takeaways",
       "items": [
-        "Curate a 'Golden Dataset' of 50 edge cases from real production logs.",
-        "Block PRs that degrade semantic eval scores below baseline thresholds.",
-        "Use faster, cheaper models (like Haiku) as your automated CI/CD evaluators."
+        "Bound conversational history growth in enterprise agent applications.",
+        "Implement sliding window compaction: summarize older turns into structured XML state.",
+        "Retain key user variables and decisions in a dedicated state scratchpad."
       ],
-      "badge": "Treat prompt changes with the same rigor as database migrations: test before merging."
+      "badge": "Active context compaction prevents attention degradation and reduces multi-turn costs by 70%."
     }
   }
 ]
