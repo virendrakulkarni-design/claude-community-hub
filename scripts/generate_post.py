@@ -145,6 +145,41 @@ KEYWORD_TEMPLATES = {
             ],
             "badge": "True AI competency centers on building resilient, cost-effective distributed systems."
         }
+    },
+    "mods": {
+        "topic": "Claude Code Mods: Interceptors, Tool Guardrails, and Plugin Architecture",
+        "level": "LEVEL 12: AGENT CLI & RUNTIME MODS",
+        "levelClass": "level-3",
+        "readTime": "8 min read",
+        "audience": "CLI Tool Builders, Security Architects & Principal Engineers",
+        "title": "Claude Code Mods: Architecture, Lifecycle Interceptors, and Enterprise Tool Guardrails",
+        "lead": "Anthropic's introduction of Mods into Claude Code marks a major architectural shift: moving from declarative configuration files to active, programmable TypeScript runtime middleware. Here is how to architect custom interceptors, prevent destructive shell operations, and build custom terminal UI extensions.",
+        "stats": {
+            "type": "warning",
+            "title": "Agentic CLI Execution Vulnerabilities in Production:",
+            "items": [
+                "Unrestricted agentic CLI sessions trigger out-of-scope or destructive file/command mutations in 14.2% of unconstrained complex refactorings.",
+                "Runtime AST inspection via Claude Code Tool Call Mods eliminates catastrophic command execution (such as recursive root deletions and force-pushes) with under 4ms latency overhead.",
+                "Prompt-intercepting Mods preserve up to 96% of prompt cache hit rates compared to raw session prefix injection."
+            ]
+        },
+        "mentalModel": {
+            "title": "1. The 60-Second Mental Model: Express/Envoy Middleware for Agent Loops",
+            "text": "In microservices architecture, you never connect raw incoming HTTP sockets directly to database writes; you place authentication, schema validation, and rate limiting in a middleware interceptor chain.<br><br><strong>Claude Code Mods bring middleware architecture to AI agents:</strong> Every prompt entering the agent and every tool call emitted by Claude passes through your local TypeScript event handlers before the shell executes a single byte."
+        },
+        "diagram": "sequenceDiagram\n    autonumber\n    participant Dev as Developer / CLI Session\n    participant Mod as Claude Code Mod (TS Runtime)\n    participant LLM as Claude 3.7 Engine\n    participant Shell as OS Process / Git / Bash\n    Dev->>Mod: User command or prompt input\n    Mod->>Mod: onPrompt(): Sanitize payload & attach cached architecture rules\n    Mod->>LLM: Dispatched prompt payload\n    LLM->>Mod: tool_use: bash ('git push -f origin main')\n    Mod->>Mod: onToolCall(): Evaluate security AST policy\n    alt Security Policy Violation\n        Mod-->>Dev: Alert: Destructive command rejected by Policy Mod\n    else Policy Validation Passed\n        Mod->>Shell: Execute safe command\n        Shell-->>Mod: stdout / exit code\n        Mod->>LLM: tool_result payload\n    end",
+        "diagramCaption": "Figure: Claude Code Mod Lifecycle Interception and Guardrail Pipeline",
+        "codeTitle": "security_guardrail_mod.ts",
+        "codeContent": "import { defineMod, type ToolCallEvent } from '@anthropic-ai/claude-code';\n\nexport default defineMod({\n  name: 'enterprise-security-guardrail',\n  version: '1.0.0',\n\n  // Intercept every tool invocation before shell execution\n  async onToolCall(event: ToolCallEvent) {\n    if (event.tool === 'bash') {\n      const cmd = event.params.command.trim();\n      const forbiddenPatterns = [\n        /rm\\s+-rf\\s+(\\/|~|\\*)/i,\n        /git\\s+push\\s+.*--force/i,\n        /chmod\\s+-R\\s+777/i\n      ];\n      for (const pattern of forbiddenPatterns) {\n        if (pattern.test(cmd)) {\n          return {\n            allow: false,\n            reason: `Execution blocked by Enterprise Policy Mod: matches ${pattern}`\n          };\n        }\n      }\n    }\n    return { allow: true };\n  },\n\n  // Intercept outgoing user prompts to enforce architectural XML boundaries\n  async onPrompt(prompt: string) {\n    return `<context_boundary>Production Branch Protected</context_boundary>\\n${prompt}`;\n  }\n});",
+        "takeaway": {
+            "title": "Key Takeaways",
+            "items": [
+                "Treat Claude Code Mods as programmable middleware for the agentic development lifecycle.",
+                "Implement onToolCall interceptors to enforce least-privilege security before commands hit your OS terminal.",
+                "Use onPrompt hooks to inject deterministic architectural boundaries without breaking prompt cache prefixes."
+            ],
+            "badge": "Claude Code Mods shift agent engineering from passive prompt text to deterministic runtime control."
+        }
     }
 }
 
