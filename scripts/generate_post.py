@@ -384,6 +384,96 @@ def validate_post_schema(post):
             raise ValueError(f"Post is missing required field: '{field}'")
     return True
 
+STOPWORDS = {
+    'a', 'an', 'the', 'and', 'or', 'but', 'if', 'in', 'on', 'at', 'to', 'for', 'with', 'by', 'of',
+    'from', 'why', 'how', 'what', 'level', 'post', 'dispatch', 'architect', 'architecture', 'claude',
+    'enterprise', 'system', 'systems', 'is', 'are', 'your', 'you', 'it', 'its', 'using', 'under', 'into'
+}
+
+def normalize_string(s: str) -> str:
+    """Normalize string for casing, punctuation, and extra whitespace."""
+    if not s or not isinstance(s, str):
+        return ""
+    s = remove_emojis(s)
+    cleaned = re.sub(r"[^\w\s]", " ", s.lower())
+    return re.sub(r"\s+", " ", cleaned).strip()
+
+def extract_tokens(text: str) -> list[str]:
+    """Extract filtered tokens excluding stop words."""
+    norm = normalize_string(text)
+    return [w for w in norm.split() if w not in STOPWORDS and len(w) > 2]
+
+def extract_bigrams(text: str) -> set[tuple[str, str]]:
+    """Extract consecutive 2-word technical concept bigrams."""
+    tokens = extract_tokens(text)
+    bigrams = set()
+    for i in range(len(tokens) - 1):
+        bigrams.add((tokens[i], tokens[i + 1]))
+    return bigrams
+
+def extract_keywords(text: str) -> set[str]:
+    """Extract unique architectural keyword set."""
+    return set(extract_tokens(text))
+
+def calculate_jaccard_similarity(set_a: set[str], set_b: set[str]) -> float:
+    """Compute token Jaccard similarity index."""
+    if not set_a or not set_b:
+        return 0.0
+    intersection = len(set_a & set_b)
+    union = len(set_a | set_b)
+    return intersection / union if union > 0 else 0.0
+
+def is_duplicate_post(candidate: dict, existing_posts: list[dict], jaccard_thresh: float = 0.45) -> tuple[bool, str]:
+    """
+    Multi-layer strict deduplication engine:
+    1. Exact normalized title or topic match
+    2. Substring title containment (one is a subset of the other)
+    3. Technical Bigram / Keyphrase collision (e.g. 'prompt caching', 'code mods', 'context compaction')
+    4. Jaccard similarity on content keywords
+    """
+    if not candidate or not isinstance(candidate, dict):
+        return False, ""
+
+    c_title = normalize_string(candidate.get("title", ""))
+    c_topic = normalize_string(candidate.get("topic", ""))
+    c_combined = f"{c_title} {c_topic}".strip()
+
+    c_kw = extract_keywords(c_combined)
+    c_bg = extract_bigrams(c_combined)
+
+    for ex in existing_posts:
+        ex_id = ex.get("id", "unknown")
+        ex_title = normalize_string(ex.get("title", ""))
+        ex_topic = normalize_string(ex.get("topic", ""))
+        ex_combined = f"{ex_title} {ex_topic}".strip()
+
+        # 1. Exact normalized title or topic match
+        if c_title and ex_title and c_title == ex_title:
+            return True, f"Exact title collision with {ex_id}: '{ex.get('title')}'"
+        if c_topic and ex_topic and c_topic == ex_topic:
+            return True, f"Exact topic collision with {ex_id}: '{ex.get('topic')}'"
+
+        # 2. Substring title containment
+        if len(c_title) > 15 and (c_title in ex_title or ex_title in c_title):
+            return True, f"Title containment collision with {ex_id}: '{ex.get('title')}'"
+
+        ex_kw = extract_keywords(ex_combined)
+        ex_bg = extract_bigrams(ex_combined)
+
+        # 3. Technical Bigram / Keyphrase Collision
+        shared_bg = c_bg & ex_bg
+        if shared_bg:
+            bg_strs = [f"{w1} {w2}" for w1, w2 in shared_bg]
+            return True, f"Core architectural concept collision with {ex_id} on: {bg_strs}"
+
+        # 4. Overall Jaccard similarity on content keywords
+        j_sim = calculate_jaccard_similarity(c_kw, ex_kw)
+        if j_sim >= jaccard_thresh:
+            shared = ", ".join(sorted(list(c_kw & ex_kw)))
+            return True, f"High keyword similarity ({j_sim:.1%}) with {ex_id} on: [{shared}]"
+
+    return False, ""
+
 def generate_custom_topic_post(custom_keyword):
     """Generate or match a customized topic post based on user suggestion."""
     api_key = os.environ.get("ANTHROPIC_API_KEY")
@@ -502,18 +592,27 @@ PROCEDURAL_ARCHITECTURAL_CONCEPTS = [
 ]
 
 def replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5):
-    """Ensure queue never runs dry by guaranteeing at least target_count (default 5) topics queued."""
+    """Ensure queue never runs dry while guaranteeing 100% uniqueness against all past and queued posts."""
+    # Step 1: Sanitize existing queue to eliminate any duplicates that might have been queued
+    sanitized_upcoming = []
+    for item in upcoming:
+        is_dup, reason = is_duplicate_post(item, posts + sanitized_upcoming)
+        if is_dup:
+            print(f"[QUEUE SANITIZER] Dropped duplicate queued post '{item.get('title')}': {reason}")
+        else:
+            sanitized_upcoming.append(item)
+    upcoming = sanitized_upcoming
+
     if len(upcoming) < min_threshold:
-        print(f"Upcoming queue is below threshold ({len(upcoming)} < {min_threshold}). Replenishing to {target_count} topics...")
-        current_titles = {p.get("title") for p in posts} | {u.get("title") for u in upcoming}
+        print(f"Upcoming queue is below threshold ({len(upcoming)} < {min_threshold}). Replenishing to {target_count} unique topics...")
         
         # 1. Fill from pre-authored RESERVE_TOPICS_POOL
         for item in RESERVE_TOPICS_POOL:
             if len(upcoming) >= target_count:
                 break
-            if item.get("title") not in current_titles:
+            is_dup, reason = is_duplicate_post(item, posts + upcoming)
+            if not is_dup:
                 upcoming.append(humanize_post(item.copy()))
-                current_titles.add(item.get("title"))
 
         # 2. Fill from PROCEDURAL_ARCHITECTURAL_CONCEPTS safety net
         concept_idx = 0
@@ -521,21 +620,21 @@ def replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5):
             concept = PROCEDURAL_ARCHITECTURAL_CONCEPTS[concept_idx]
             concept_idx += 1
             generated = generate_custom_topic_post(concept)
-            if generated.get("title") not in current_titles:
+            is_dup, reason = is_duplicate_post(generated, posts + upcoming)
+            if not is_dup:
                 upcoming.append(humanize_post(generated))
-                current_titles.add(generated.get("title"))
 
-        # 3. Ultimate fallback generator so queue can literally never be empty
+        # 3. Dynamic procedural generator so queue can literally never run out of unique topics
         counter = len(posts) + len(upcoming) + 1
         while len(upcoming) < target_count:
             fallback_concept = f"Enterprise Claude Architecture Pattern Level {counter}"
             generated = generate_custom_topic_post(fallback_concept)
-            if generated.get("title") not in current_titles:
+            is_dup, reason = is_duplicate_post(generated, posts + upcoming)
+            if not is_dup:
                 upcoming.append(humanize_post(generated))
-                current_titles.add(generated.get("title"))
             counter += 1
 
-        print(f"Queue successfully replenished. Total available topics: {len(upcoming)}")
+        print(f"Queue successfully replenished. Total unique available topics: {len(upcoming)}")
     return upcoming
 
 def main():
@@ -558,15 +657,35 @@ def main():
 
     # Check for custom topic override
     if args.custom_topic and args.custom_topic.strip():
-        print(f"Custom topic suggested: '{args.custom_topic}'")
-        post_to_publish = generate_custom_topic_post(args.custom_topic.strip())
+        kw = args.custom_topic.strip()
+        print(f"Custom topic suggested: '{kw}'")
+        dummy_candidate = {"title": kw, "topic": kw}
+        is_dup, reason = is_duplicate_post(dummy_candidate, posts)
+        if is_dup:
+            print(f"[DEDUPLICATION GATE] Topic '{kw}' has already been covered: {reason}")
+            print("To preserve hub integrity and zero-repetition rules, duplicate topics are rejected.")
+            sys.exit(0)
+        post_to_publish = generate_custom_topic_post(kw)
     else:
-        # Check and ensure queue is maintained at 4-5 topics before publishing
+        # Check and ensure queue is maintained at 4-5 unique topics before publishing
         upcoming = replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5)
         if not upcoming:
             print("No topics available.")
             sys.exit(0)
         post_to_publish = upcoming.pop(0)
+
+        # Pre-publish deduplication gate: loop until a verified unique candidate is selected
+        while True:
+            is_dup, reason = is_duplicate_post(post_to_publish, posts)
+            if not is_dup:
+                break
+            print(f"[DEDUPLICATION GATE] Rejected duplicate candidate '{post_to_publish.get('title')}': {reason}")
+            if not upcoming:
+                upcoming = replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5)
+            if not upcoming:
+                print("Error: Could not retrieve a unique candidate.")
+                sys.exit(0)
+            post_to_publish = upcoming.pop(0)
 
         # Immediately replenish after popping so queue ALWAYS maintains 4-5 items remaining
         upcoming = replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5)
@@ -577,11 +696,17 @@ def main():
         post_to_publish["publishedAt"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     validate_post_schema(post_to_publish)
 
-    print(f"Publishing: {post_to_publish['title']}")
+    # Final unbypassable uniqueness check against all existing posts
+    is_dup, reason = is_duplicate_post(post_to_publish, posts)
+    if is_dup:
+        print(f"[FATAL REJECT] Final deduplication gate blocked publication: {reason}")
+        sys.exit(1)
+
+    print(f"Publishing verified unique post: {post_to_publish['title']}")
 
     if args.dry_run:
-        print(f"[DRY RUN] Validated post: {post_to_publish['title']}")
-        print(f"[DRY RUN] Queue would contain {len(upcoming)} remaining topics.")
+        print(f"[DRY RUN] Validated unique post: {post_to_publish['title']}")
+        print(f"[DRY RUN] Queue contains {len(upcoming)} verified unique topics.")
         return
 
     # Append and commit
