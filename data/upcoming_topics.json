@@ -1,41 +1,5 @@
 [
   {
-    "id": "topic-parallel-tool-calling",
-    "topic": "Parallel Tool Execution & Fan-Out Latency Optimization",
-    "level": "LEVEL 14: CONCURRENT AGENT RUNTIMES",
-    "levelClass": "level-3",
-    "readTime": "7 min read",
-    "audience": "Performance Engineers & Backend Architects",
-    "title": "Parallel Tool Calling: Cutting Agent Latency by 70% with Concurrent Fan-Out",
-    "lead": "Sequential tool calling kills user experience. When Claude generates multiple independent tool calls in a single turn, executing them serially forces users to wait for the cumulative sum of network delays. Fan-out execution transforms latency to the max duration of a single call.",
-    "stats": {
-      "type": "info",
-      "title": "Latency Benchmarks in High-Throughput Agent Systems:",
-      "items": [
-        "Serial execution of 4 database queries and 2 microservice checks averages 3,840ms of latency per agent turn.",
-        "Async fan-out via asyncio.gather compresses turn latency down to 620ms (an 83.8% reduction), matching the slowest single RPC.",
-        "Batching tool results in a single turn reduces total token round-trips by 4x compared to conversational ping-pong."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: A Single Supermarket Checkout vs. Four Self-Service Lanes",
-      "text": "If you have 4 items from 4 different aisles, waiting for 1 clerk to scan item #1, walk into the warehouse, return, and scan item #2 is madness.<br><br><strong>Parallel Tool Calling scans all items concurrently:</strong> Claude inspects your schemas, outputs all 4 tool calls in a single response block, your runtime dispatches them simultaneously over HTTP/2, and aggregates the results before the next reasoning turn."
-    },
-    "diagram": "sequenceDiagram\n    autonumber\n    participant App as Agent Runtime\n    participant Claude as Claude 3.7 Engine\n    participant DB as Postgres DB\n    participant Cache as Redis Cache\n    participant API as Stripe API\n    App->>Claude: 'Verify customer status and last 3 invoices'\n    Claude-->>App: Emits 3 parallel tool_use blocks (DB, Cache, API)\n    par Concurrent Fan-Out\n        App->>DB: query_orders()\n        App->>Cache: get_session()\n        App->>API: fetch_invoices()\n    and Concurrent Fan-In\n        DB-->>App: orders_result (180ms)\n        Cache-->>App: session_result (25ms)\n        API-->>App: invoices_result (410ms)\n    end\n    Note over App: Total latency = 410ms (bounded by Stripe)\n    App->>Claude: Sends batch tool_result array\n    Claude-->>App: Synthesizes final response",
-    "diagramCaption": "Figure: Concurrent Fan-Out and Fan-In Tool Dispatch Pipeline",
-    "codeTitle": "parallel_tool_executor.py",
-    "codeContent": "import asyncio\nfrom typing import Any\n\nasync def dispatch_tool_call(tool_call: dict) -> dict:\n    name, args, call_id = tool_call[\"name\"], tool_call[\"input\"], tool_call[\"id\"]\n    try:\n        handler = TOOL_REGISTRY[name]\n        result = await handler(**args)\n        return {\"type\": \"tool_result\", \"tool_use_id\": call_id, \"content\": str(result)}\n    except Exception as err:\n        return {\"type\": \"tool_result\", \"tool_use_id\": call_id, \"content\": f\"Error: {err}\", \"is_error\": True}\n\nasync def execute_turn_tools_parallel(tool_calls: list[dict]) -> list[dict]:\n    \"\"\"Execute all tool calls concurrently using asyncio.gather.\"\"\"\n    tasks = [dispatch_tool_call(call) for call in tool_calls]\n    return await asyncio.gather(*tasks)",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Parse all tool_use blocks in a single response turn and dispatch concurrently.",
-        "Set individual timeout thresholds on external API tool calls to prevent slow endpoints from hanging the agent.",
-        "Always return is_error=True with descriptive error messages when individual tools fail so Claude can self-correct."
-      ],
-      "badge": "Parallel tool execution converts sequential lag into bounded concurrent performance."
-    }
-  },
-  {
     "id": "topic-dynamic-model-routing",
     "topic": "Dynamic Model Routing: Tiering Claude 3.7 Sonnet and 3.5 Haiku",
     "level": "LEVEL 15: LATENCY & COST OPTIMIZATION",
@@ -175,6 +139,41 @@
         "Append dynamic variables (dates, user IDs, session state) strictly at the very end."
       ],
       "badge": "Deterministic prompt ordering transforms expensive token processing into cheap cache hits."
+    }
+  },
+  {
+    "topic": "Parallel Tool Execution & Fan-Out Latency Optimization",
+    "level": "LEVEL 14: CONCURRENT AGENT RUNTIMES",
+    "levelClass": "level-3",
+    "readTime": "7 min read",
+    "audience": "Performance Engineers & Backend Architects",
+    "title": "Parallel Tool Calling: Cutting Agent Latency by 70% with Concurrent Fan-Out",
+    "lead": "Sequential tool calling kills user experience. When Claude generates multiple independent tool calls in a single turn, executing them serially forces users to wait for the cumulative sum of network delays. Fan-out execution transforms latency to the max duration of a single call.",
+    "stats": {
+      "type": "info",
+      "title": "Latency Benchmarks in High-Throughput Agent Systems:",
+      "items": [
+        "Serial execution of 4 database queries and 2 microservice checks averages 3,840ms of latency per agent turn.",
+        "Async fan-out via asyncio.gather compresses turn latency down to 620ms (an 83.8% reduction), matching the slowest single RPC.",
+        "Batching tool results in a single turn reduces total token round-trips by 4x compared to conversational ping-pong."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: A Single Supermarket Checkout vs. Four Self-Service Lanes",
+      "text": "If you have 4 items from 4 different aisles, waiting for 1 clerk to scan item #1, walk into the warehouse, return, and scan item #2 is madness.<br><br><strong>Parallel Tool Calling scans all items concurrently:</strong> Claude inspects your schemas, outputs all 4 tool calls in a single response block, your runtime dispatches them simultaneously over HTTP/2, and aggregates the results before the next reasoning turn."
+    },
+    "diagram": "sequenceDiagram\n autonumber\n participant App as Agent Runtime\n participant Claude as Claude 3.7 Engine\n participant DB as Postgres DB\n participant Cache as Redis Cache\n participant API as Stripe API\n App->>Claude: 'Verify customer status and last 3 invoices'\n Claude-->>App: Emits 3 parallel tool_use blocks (DB, Cache, API)\n par Concurrent Fan-Out\n App->>DB: query_orders()\n App->>Cache: get_session()\n App->>API: fetch_invoices()\n and Concurrent Fan-In\n DB-->>App: orders_result (180ms)\n Cache-->>App: session_result (25ms)\n API-->>App: invoices_result (410ms)\n end\n Note over App: Total latency = 410ms (bounded by Stripe)\n App->>Claude: Sends batch tool_result array\n Claude-->>App: Synthesizes final response",
+    "diagramCaption": "Figure: Concurrent Fan-Out and Fan-In Tool Dispatch Pipeline",
+    "codeTitle": "parallel_tool_executor.py",
+    "codeContent": "import asyncio\nfrom typing import Any\n\nasync def dispatch_tool_call(tool_call: dict) -> dict:\n name, args, call_id = tool_call[\"name\"], tool_call[\"input\"], tool_call[\"id\"]\n try:\n handler = TOOL_REGISTRY[name]\n result = await handler(**args)\n return {\"type\": \"tool_result\", \"tool_use_id\": call_id, \"content\": str(result)}\n except Exception as err:\n return {\"type\": \"tool_result\", \"tool_use_id\": call_id, \"content\": f\"Error: {err}\", \"is_error\": True}\n\nasync def execute_turn_tools_parallel(tool_calls: list[dict]) -> list[dict]:\n \"\"\"Execute all tool calls concurrently using asyncio.gather.\"\"\"\n tasks = [dispatch_tool_call(call) for call in tool_calls]\n return await asyncio.gather(*tasks)",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Parse all tool_use blocks in a single response turn and dispatch concurrently.",
+        "Set individual timeout thresholds on external API tool calls to prevent slow endpoints from hanging the agent.",
+        "Always return is_error=True with descriptive error messages when individual tools fail so Claude can self-correct."
+      ],
+      "badge": "Parallel tool execution converts sequential lag into bounded concurrent performance."
     }
   }
 ]
