@@ -1,41 +1,5 @@
 [
   {
-    "id": "topic-multi-agent-supervisor",
-    "topic": "Multi-Agent Supervisor Architecture: Deterministic Routing and State Machines",
-    "level": "LEVEL 13: MULTI-AGENT ORCHESTRATION",
-    "levelClass": "level-3",
-    "readTime": "9 min read",
-    "audience": "Distributed Systems & Agent Architects",
-    "title": "Multi-Agent Supervisor Architecture: Why Chatty Swarms Fail and State Machines Win",
-    "lead": "Deploying autonomous agents that freely talk to each other in chat rooms results in runaway token costs, cyclic hallucination loops, and deadlocks. Enterprise agentic workflows require a strict supervisor state machine where worker agents report only to deterministic orchestrators.",
-    "stats": {
-      "type": "danger",
-      "title": "The Cost of Unconstrained Agent Swarms:",
-      "items": [
-        "Unstructured multi-agent chat loops enter infinite circular reasoning in 24.3% of edge-case software refactoring tasks, driving token burn up by 680%.",
-        "Hierarchical supervisor state machines with explicit transition guards improve end-to-end task completion rates from 51% to 94.2% on SWE-bench complex evaluations.",
-        "Centralized state validation catches 98% of out-of-bounds agent side effects before changes reach git worktrees."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: An Improv Jam vs. An Air Traffic Controller",
-      "text": "When five jazz musicians improvise without a score, it might sound interesting—until they all play over each other at full volume. An airport cannot run on an improv jam session. Pilots do not negotiate runways with other pilots; every plane talks exclusively to the Air Traffic Controller.<br><br><strong>Supervisor Architecture treats Claude as an Air Traffic Controller:</strong> Worker agents (Coder, Tester, Security Auditor) never speak directly to each other. They receive discrete bounded tasks, return structured results, and the Supervisor makes the deterministic routing decision."
-    },
-    "diagram": "graph TD\n    Client[\"Client Work Order\"] --> Sup[\"Supervisor Agent<br/>(State Machine Controller)\"]\n    subgraph Workers [\"Specialized Worker Nodes\"]\n        W1[\"Spec Analyzer Agent\"]\n        W2[\"Code Generator Agent\"]\n        W3[\"Test Verifier Agent\"]\n    end\n    Sup -->|1. Dispatches Subtask| W1\n    W1 -->|Returns Structured AST| Sup\n    Sup -->|2. Dispatches Context| W2\n    W2 -->|Returns Patch Diff| Sup\n    Sup -->|3. Dispatches Verification| W3\n    W3 -->|Returns Test Verdict| Sup\n    Sup --> Gate{\"All Gates Passed?\"}\n    Gate -- YES --> Merge[\"Merge to Branch\"]\n    Gate -- NO --> Rollback[\"Rollback State\"]\n    style Sup fill:#1e3a8a,stroke:#60a5fa,color:#fff\n    style Gate fill:#065f46,stroke:#34d399,color:#fff",
-    "diagramCaption": "Figure: Hierarchical Supervisor State Machine Pattern",
-    "codeTitle": "supervisor_state_machine.py",
-    "codeContent": "from typing import Literal\nfrom pydantic import BaseModel\n\nclass OrchestrationState(BaseModel):\n    current_phase: Literal[\"spec\", \"code\", \"verify\", \"complete\", \"failed\"]\n    spec_summary: str = \"\"\n    code_diff: str = \"\"\n    verification_errors: list[str] = []\n    retry_count: int = 0\n\ndef supervisor_transition(state: OrchestrationState) -> str:\n    \"\"\"Deterministic routing guardrail - never let agents guess state transitions.\"\"\"\n    if state.current_phase == \"spec\" and state.spec_summary:\n        return \"code\"\n    if state.current_phase == \"code\" and state.code_diff:\n        return \"verify\"\n    if state.current_phase == \"verify\":\n        if not state.verification_errors:\n            return \"complete\"\n        if state.retry_count < 3:\n            state.retry_count += 1\n            return \"code\"  # Bounded self-correction loop\n        return \"failed\"\n    return \"spec\"",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Eliminate peer-to-peer agent chatter; enforce strict star-topology reporting to a central supervisor.",
-        "Encode phase transitions as deterministic Python/TypeScript state machines rather than asking LLMs what to do next.",
-        "Cap retry loops with strict threshold counters to prevent token runaway."
-      ],
-      "badge": "Autonomous swarms create chaos; deterministic supervisor state machines create production software."
-    }
-  },
-  {
     "id": "topic-parallel-tool-calling",
     "topic": "Parallel Tool Execution & Fan-Out Latency Optimization",
     "level": "LEVEL 14: CONCURRENT AGENT RUNTIMES",
