@@ -591,7 +591,7 @@ PROCEDURAL_ARCHITECTURAL_CONCEPTS = [
     "Model Context Protocol (MCP) Multi-Server Security Boundaries"
 ]
 
-def replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5):
+def replenish_queue_if_low(upcoming, posts, target_count=5):
     """Ensure queue never runs dry while guaranteeing 100% uniqueness against all past and queued posts."""
     # Step 1: Sanitize existing queue to eliminate any duplicates that might have been queued
     sanitized_upcoming = []
@@ -603,8 +603,8 @@ def replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5):
             sanitized_upcoming.append(item)
     upcoming = sanitized_upcoming
 
-    if len(upcoming) < min_threshold:
-        print(f"Upcoming queue is below threshold ({len(upcoming)} < {min_threshold}). Replenishing to {target_count} unique topics...")
+    if len(upcoming) < target_count:
+        print(f"Upcoming queue has {len(upcoming)} topics (target: {target_count}). Replenishing to {target_count} unique topics...")
         
         # 1. Fill from pre-authored RESERVE_TOPICS_POOL
         for item in RESERVE_TOPICS_POOL:
@@ -667,8 +667,8 @@ def main():
             sys.exit(0)
         post_to_publish = generate_custom_topic_post(kw)
     else:
-        # Check and ensure queue is maintained at 4-5 unique topics before publishing
-        upcoming = replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5)
+        # Check and ensure queue is maintained at 5 unique topics before publishing
+        upcoming = replenish_queue_if_low(upcoming, posts, target_count=5)
         if not upcoming:
             print("No topics available.")
             sys.exit(0)
@@ -681,14 +681,14 @@ def main():
                 break
             print(f"[DEDUPLICATION GATE] Rejected duplicate candidate '{post_to_publish.get('title')}': {reason}")
             if not upcoming:
-                upcoming = replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5)
+                upcoming = replenish_queue_if_low(upcoming, posts, target_count=5)
             if not upcoming:
                 print("Error: Could not retrieve a unique candidate.")
                 sys.exit(0)
             post_to_publish = upcoming.pop(0)
 
-        # Immediately replenish after popping so queue ALWAYS maintains 4-5 items remaining
-        upcoming = replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5)
+        # Immediately replenish after popping so queue ALWAYS maintains 5 items remaining
+        upcoming = replenish_queue_if_low(upcoming, posts, target_count=5)
 
     post_to_publish = humanize_post(post_to_publish)
     post_to_publish["id"] = f"post-{len(posts) + 1}"

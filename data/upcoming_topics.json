@@ -142,5 +142,39 @@
       ],
       "badge": "Defense-in-depth: Never rely on prompt politeness when architectural boundaries can enforce compliance."
     }
+  },
+  {
+    "topic": "Prompt Cache Prefix Economics: Eliminating Cache Invalidation Thrashing",
+    "level": "LEVEL 19: PROMPT CACHE OPTIMIZATION",
+    "levelClass": "level-2",
+    "readTime": "7 min read",
+    "audience": "AI Infrastructure Engineers & FinOps",
+    "title": "Prompt Cache Prefix Economics: How Small Changes Invalidate Megabytes of Cache",
+    "lead": "Anthropic's prompt caching slashes input costs by 90% and latency by 85%, but only if prefixes remain strictly static. Moving dynamic variables even one character forward can silently invalidate thousands of tokens.",
+    "stats": {
+      "type": "warning",
+      "title": "Prompt Caching Invalidation Telemetry:",
+      "items": [
+        "Placing dynamic timestamps at the beginning of system prompts causes a 0% cache hit rate across all turns.",
+        "Ordering prompt blocks hierarchically (System Rules -> Static Tools -> Cached Docs -> Dynamic Query) achieves a sustained 94.2% cache hit rate."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: CPU L1/L2 Cache Lines vs. Memory Bus",
+      "text": "CPUs rely on spatial and temporal locality. If you write random values to byte 0 of a cache line, the CPU must dump the entire line.<br><br><strong>Prompt caching uses prefix matching:</strong> Anthropic hashes prompt tokens from left to right. Any change at index 50 invalidates everything from index 50 to 100,000."
+    },
+    "diagram": "graph LR\n subgraph Bad [\"Broken Ordering (0% Cache Hit)\"]\n B1[\"Dynamic Timestamp (Changes Every Turn)\"] --> B2[\"System Rules (Invalidated!)\"] --> B3[\"100k Documentation (Invalidated!)\"]\n end\n subgraph Good [\"Optimal Ordering (95% Cache Hit)\"]\n G1[\"Static System Rules (Cached!)\"] --> G2[\"API Schemas (Cached!)\"] --> G3[\"100k Doc Base (Cached!)\"] --> G4[\"User Query (Dynamic Turn)\"]\n end\n style Good fill:#065f46,stroke:#34d399,color:#fff\n style Bad fill:#7f1d1d,stroke:#f87171,color:#fff",
+    "diagramCaption": "Figure: Static Prefix Ordering for Maximum Cache Retention",
+    "codeTitle": "cache_optimized_prompt.py",
+    "codeContent": "# Correct prefix ordering for Anthropic Prompt Caching\nmessages = [\n # Block 1: Immutable Persona (cached)\n {'type': 'text', 'text': IMMUTABLE_SYSTEM_RULES, 'cache_control': {'type': 'ephemeral'}},\n # Block 2: Static Tool & Schema Definitions (cached)\n {'type': 'text', 'text': ENTERPRISE_SCHEMAS, 'cache_control': {'type': 'ephemeral'}},\n # Block 3: Dynamic Turn Input (uncached)\n {'type': 'text', 'text': f'User Turn: {user_input}'}\n]",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Place large, immutable documentation and schemas at the earliest positions in your prompt payload.",
+        "Mark cache checkpoints explicitly using cache_control: ephemeral.",
+        "Append dynamic variables (dates, user IDs, session state) strictly at the very end."
+      ],
+      "badge": "Deterministic prompt ordering transforms expensive token processing into cheap cache hits."
+    }
   }
 ]
