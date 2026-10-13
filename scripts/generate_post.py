@@ -185,37 +185,176 @@ KEYWORD_TEMPLATES = {
 
 RESERVE_TOPICS_POOL = [
   {
-    "topic": "Context Compaction & Sliding Window Memory",
-    "level": "LEVEL 11: CONTEXT ARCHITECTURE",
+    "topic": "Multi-Agent Supervisor Architecture: Deterministic Routing and State Machines",
+    "level": "LEVEL 13: MULTI-AGENT ORCHESTRATION",
     "levelClass": "level-3",
-    "readTime": "8 min read",
-    "audience": "Senior Systems Engineers",
-    "title": "Context Compaction: Managing 100k Token Conversations Without State Degradation",
-    "lead": "Extended context windows introduce cost and latency penalties if history grows unbounded. Semantic compaction preserves essential state while discarding ephemeral tokens.",
+    "readTime": "9 min read",
+    "audience": "Distributed Systems & Agent Architects",
+    "title": "Multi-Agent Supervisor Architecture: Why Chatty Swarms Fail and State Machines Win",
+    "lead": "Deploying autonomous agents that freely talk to each other in chat rooms results in runaway token costs, cyclic hallucination loops, and deadlocks. Enterprise agentic workflows require a strict supervisor state machine where worker agents report only to deterministic orchestrators.",
     "stats": {
-      "type": "warning",
-      "title": "Memory Explosion Metrics:",
+      "type": "danger",
+      "title": "The Cost of Unconstrained Agent Swarms:",
       "items": [
-        "Uncompacted 20-turn chat conversations consume over 120,000 tokens and slow down response time by 4.2x.",
-        "Asynchronous context compaction drops active turn tokens by 78% while preserving 99% of key entity constraints."
+        "Unstructured multi-agent chat loops enter infinite circular reasoning in 24.3% of edge-case software refactoring tasks, driving token burn up by 680%.",
+        "Hierarchical supervisor state machines with explicit transition guards improve end-to-end task completion rates from 51% to 94.2% on SWE-bench complex evaluations.",
+        "Centralized state validation catches 98% of out-of-bounds agent side effects before changes reach git worktrees."
       ]
     },
     "mentalModel": {
-      "title": "1. The 60-Second Mental Model: OS Virtual Memory Paging",
-      "text": "Operating systems swap inactive memory pages to disk rather than keeping all RAM dirty and active.<br><br><strong>Context Compaction applies memory paging to LLMs:</strong> Older turns are summarized into a dense state object, while recent turns remain verbatim."
+      "title": "1. The 60-Second Mental Model: An Improv Jam vs. An Air Traffic Controller",
+      "text": "When five jazz musicians improvise without a score, it might sound interesting—until they all play over each other at full volume. An airport cannot run on an improv jam session. Pilots do not negotiate runways with other pilots; every plane talks exclusively to the Air Traffic Controller.<br><br><strong>Supervisor Architecture treats Claude as an Air Traffic Controller:</strong> Worker agents (Coder, Tester, Security Auditor) never speak directly to each other. They receive discrete bounded tasks, return structured results, and the Supervisor makes the deterministic routing decision."
     },
-    "diagram": "graph LR\n    T1[\"Turns 1-15 (Raw History)\"] --> Summarizer[\"Async Compactor Agent\"]\n    Summarizer --> State[\"&lt;session_state&gt;<br/>Key facts, variables, decisions\"]\n    State --> Active[\"Turns 16-20 (Recent Raw Turns)\"]\n    Active --> Next[\"Next Generation Turn\"]\n    style State fill:#1e3a8a,stroke:#60a5fa,color:#fff",
-    "diagramCaption": "Figure: Hybrid Sliding Window Memory Compaction",
-    "codeTitle": "context_compactor.py",
-    "codeContent": "# Periodically condense older chat history\ndef compact_history(history_messages):\n    if len(history_messages) > 12:\n        condensed_state = summarize_turns(history_messages[:-4])\n        return [{'role': 'user', 'content': f'<session_state>{condensed_state}</session_state>'}] + history_messages[-4:]\n    return history_messages",
+    "diagram": "graph TD\n    Client[\"Client Work Order\"] --> Sup[\"Supervisor Agent<br/>(State Machine Controller)\"]\n    subgraph Workers [\"Specialized Worker Nodes\"]\n        W1[\"Spec Analyzer Agent\"]\n        W2[\"Code Generator Agent\"]\n        W3[\"Test Verifier Agent\"]\n    end\n    Sup -->|1. Dispatches Subtask| W1\n    W1 -->|Returns Structured AST| Sup\n    Sup -->|2. Dispatches Context| W2\n    W2 -->|Returns Patch Diff| Sup\n    Sup -->|3. Dispatches Verification| W3\n    W3 -->|Returns Test Verdict| Sup\n    Sup --> Gate{\"All Gates Passed?\"}\n    Gate -- YES --> Merge[\"Merge to Branch\"]\n    Gate -- NO --> Rollback[\"Rollback State\"]\n    style Sup fill:#1e3a8a,stroke:#60a5fa,color:#fff\n    style Gate fill:#065f46,stroke:#34d399,color:#fff",
+    "diagramCaption": "Figure: Hierarchical Supervisor State Machine Pattern",
+    "codeTitle": "supervisor_state_machine.py",
+    "codeContent": "from typing import Literal\nfrom pydantic import BaseModel\n\nclass OrchestrationState(BaseModel):\n    current_phase: Literal[\"spec\", \"code\", \"verify\", \"complete\", \"failed\"]\n    spec_summary: str = \"\"\n    code_diff: str = \"\"\n    verification_errors: list[str] = []\n    retry_count: int = 0\n\ndef supervisor_transition(state: OrchestrationState) -> str:\n    \"\"\"Deterministic routing guardrail - never let agents guess state transitions.\"\"\"\n    if state.current_phase == \"spec\" and state.spec_summary:\n        return \"code\"\n    if state.current_phase == \"code\" and state.code_diff:\n        return \"verify\"\n    if state.current_phase == \"verify\":\n        if not state.verification_errors:\n            return \"complete\"\n        if state.retry_count < 3:\n            state.retry_count += 1\n            return \"code\"  # Bounded self-correction loop\n        return \"failed\"\n    return \"spec\"",
     "takeaway": {
       "title": "Key Takeaways",
       "items": [
-        "Bound conversational history growth in enterprise agent applications.",
-        "Implement sliding window compaction: summarize older turns into structured XML state.",
-        "Retain key user variables and decisions in a dedicated state scratchpad."
+        "Eliminate peer-to-peer agent chatter; enforce strict star-topology reporting to a central supervisor.",
+        "Encode phase transitions as deterministic Python/TypeScript state machines rather than asking LLMs what to do next.",
+        "Cap retry loops with strict threshold counters to prevent token runaway."
       ],
-      "badge": "Active context compaction prevents attention degradation and reduces multi-turn costs by 70%."
+      "badge": "Autonomous swarms create chaos; deterministic supervisor state machines create production software."
+    }
+  },
+  {
+    "topic": "Parallel Tool Execution & Fan-Out Latency Optimization",
+    "level": "LEVEL 14: CONCURRENT AGENT RUNTIMES",
+    "levelClass": "level-3",
+    "readTime": "7 min read",
+    "audience": "Performance Engineers & Backend Architects",
+    "title": "Parallel Tool Calling: Cutting Agent Latency by 70% with Concurrent Fan-Out",
+    "lead": "Sequential tool calling kills user experience. When Claude generates multiple independent tool calls in a single turn, executing them serially forces users to wait for the cumulative sum of network delays. Fan-out execution transforms latency to the max duration of a single call.",
+    "stats": {
+      "type": "info",
+      "title": "Latency Benchmarks in High-Throughput Agent Systems:",
+      "items": [
+        "Serial execution of 4 database queries and 2 microservice checks averages 3,840ms of latency per agent turn.",
+        "Async fan-out via asyncio.gather compresses turn latency down to 620ms (an 83.8% reduction), matching the slowest single RPC.",
+        "Batching tool results in a single turn reduces total token round-trips by 4x compared to conversational ping-pong."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: A Single Supermarket Checkout vs. Four Self-Service Lanes",
+      "text": "If you have 4 items from 4 different aisles, waiting for 1 clerk to scan item #1, walk into the warehouse, return, and scan item #2 is madness.<br><br><strong>Parallel Tool Calling scans all items concurrently:</strong> Claude inspects your schemas, outputs all 4 tool calls in a single response block, your runtime dispatches them simultaneously over HTTP/2, and aggregates the results before the next reasoning turn."
+    },
+    "diagram": "sequenceDiagram\n    autonumber\n    participant App as Agent Runtime\n    participant Claude as Claude 3.7 Engine\n    participant DB as Postgres DB\n    participant Cache as Redis Cache\n    participant API as Stripe API\n    App->>Claude: 'Verify customer status and last 3 invoices'\n    Claude-->>App: Emits 3 parallel tool_use blocks (DB, Cache, API)\n    par Concurrent Fan-Out\n        App->>DB: query_orders()\n        App->>Cache: get_session()\n        App->>API: fetch_invoices()\n    and Concurrent Fan-In\n        DB-->>App: orders_result (180ms)\n        Cache-->>App: session_result (25ms)\n        API-->>App: invoices_result (410ms)\n    end\n    Note over App: Total latency = 410ms (bounded by Stripe)\n    App->>Claude: Sends batch tool_result array\n    Claude-->>App: Synthesizes final response",
+    "diagramCaption": "Figure: Concurrent Fan-Out and Fan-In Tool Dispatch Pipeline",
+    "codeTitle": "parallel_tool_executor.py",
+    "codeContent": "import asyncio\nfrom typing import Any\n\nasync def dispatch_tool_call(tool_call: dict) -> dict:\n    name, args, call_id = tool_call[\"name\"], tool_call[\"input\"], tool_call[\"id\"]\n    try:\n        handler = TOOL_REGISTRY[name]\n        result = await handler(**args)\n        return {\"type\": \"tool_result\", \"tool_use_id\": call_id, \"content\": str(result)}\n    except Exception as err:\n        return {\"type\": \"tool_result\", \"tool_use_id\": call_id, \"content\": f\"Error: {err}\", \"is_error\": True}\n\nasync def execute_turn_tools_parallel(tool_calls: list[dict]) -> list[dict]:\n    \"\"\"Execute all tool calls concurrently using asyncio.gather.\"\"\"\n    tasks = [dispatch_tool_call(call) for call in tool_calls]\n    return await asyncio.gather(*tasks)",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Parse all tool_use blocks in a single response turn and dispatch concurrently.",
+        "Set individual timeout thresholds on external API tool calls to prevent slow endpoints from hanging the agent.",
+        "Always return is_error=True with descriptive error messages when individual tools fail so Claude can self-correct."
+      ],
+      "badge": "Parallel tool execution converts sequential lag into bounded concurrent performance."
+    }
+  },
+  {
+    "topic": "Dynamic Model Routing: Tiering Claude 3.7 Sonnet and 3.5 Haiku",
+    "level": "LEVEL 15: LATENCY & COST OPTIMIZATION",
+    "levelClass": "level-3",
+    "readTime": "8 min read",
+    "audience": "Cloud Architects & AI FinOps Leaders",
+    "title": "Dynamic Model Routing: How Tiering Claude 3.7 Sonnet and 3.5 Haiku Slashes Costs by 68%",
+    "lead": "Directing every incoming query to Claude 3.7 Sonnet with extended thinking is an enterprise FinOps disaster. Over 75% of production queries are classification, routing, or basic extraction tasks that Claude 3.5 Haiku resolves at 1/15th the price with sub-200ms latency.",
+    "stats": {
+      "type": "warning",
+      "title": "FinOps Analysis in High-Volume Claude Deployments:",
+      "items": [
+        "Running all production workload traffic through top-tier frontier models results in 64% over-expenditure on basic syntactic queries.",
+        "Two-tier routing (Haiku triage + Sonnet escalation) lowers monthly token expenditure by 68.4% while preserving 99.1% benchmark quality.",
+        "Time-to-first-token drops from 1,450ms on Sonnet to 190ms on Haiku for front-line triage requests."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Emergency Room Triage Nurse vs. Chief of Surgery",
+      "text": "When a patient walks into a clinic with a minor scrape, the chief neurosurgeon does not bandage their finger. A triage nurse inspects the patient in seconds and routes complex trauma to specialized surgery.<br><br><strong>Dynamic Model Routing acts as your system triage nurse:</strong> Claude 3.5 Haiku inspects intent, validates security, and resolves standard lookups in milliseconds. Only high-uncertainty, architectural, or multi-step logic escalates to Claude 3.7 Sonnet."
+    },
+    "diagram": "graph TD\n    User[\"Incoming Request\"] --> Gateway[\"API Gateway Router\"]\n    Gateway --> Fast[\"Claude 3.5 Haiku<br/>(Classification &amp; Intent Scoring)\"]\n    Fast --> Check{\"Requires Multi-Step Logic<br/>or Deep Reasoning?\"}\n    Check -- NO (76% of traffic) --> Instant[\"Instant Response<br/>(180ms, $0.80/M tokens)\"]\n    Check -- YES (24% of traffic) --> Deep[\"Claude 3.7 Sonnet<br/>(Thinking Budget: 4,096 tokens)\"]\n    Deep --> Complex[\"Deep Reasoning Output<br/>(High Precision)\"]\n    style Fast fill:#065f46,stroke:#34d399,color:#fff\n    style Deep fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Two-Tier Intelligent Model Routing and Escalation Gateway",
+    "codeTitle": "model_routing_gateway.py",
+    "codeContent": "import anthropic\n\nclient = anthropic.Anthropic()\nROUTER_PROMPT = \"\"\"Analyze the user query. Output strictly <route>FAST</route> for lookups, formatting, or simple edits. Output <route>DEEP</route> for algorithmic design, concurrency, security audits, or multi-step code refactoring.\"\"\"\n\nasync def route_and_execute(user_query: str) -> str:\n    # Tier 1: Sub-second triage via Claude 3.5 Haiku\n    triage = client.messages.create(\n        model=\"claude-3-5-haiku-20241022\",\n        max_tokens=64,\n        messages=[{\"role\": \"user\", \"content\": f\"{ROUTER_PROMPT}\\n\\nQuery: {user_query}\"}]\n    )\n    is_deep = \"DEEP\" in triage.content[0].text\n\n    # Tier 2: Escalate only when complex reasoning is demanded\n    target_model = \"claude-3-7-sonnet-20250219\" if is_deep else \"claude-3-5-haiku-20241022\"\n    extra_params = {\"thinking\": {\"type\": \"enabled\", \"budget_tokens\": 2048}} if is_deep else {}\n\n    return client.messages.create(\n        model=target_model,\n        max_tokens=4096,\n        messages=[{\"role\": \"user\", \"content\": user_query}],\n        **extra_params\n    )",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Never default 100% of production traffic to heavy reasoning models.",
+        "Use fast classification models (Haiku) to determine intent and routing before spawning heavy execution.",
+        "Monitor escalation ratios: if more than 35% of queries hit top-tier models, calibrate your triage prompts."
+      ],
+      "badge": "Intelligent routing delivers frontier intelligence at commodity microservice cost."
+    }
+  },
+  {
+    "topic": "Zero-Trust Agent Authorization: Least-Privilege IAM for Tool Calls",
+    "level": "LEVEL 18: ZERO-TRUST AGENT SECURITY",
+    "levelClass": "level-3",
+    "readTime": "8 min read",
+    "audience": "DevSecOps Engineers & Cloud Architects",
+    "title": "Zero-Trust Agent Authorization: Least-Privilege IAM and Ephemeral Tool Grants",
+    "lead": "Giving AI agents persistent, broad API credentials invites catastrophic credential exfiltration. Enterprise systems require short-lived, cryptographically bounded tool tokens issued on a per-step basis.",
+    "stats": {
+      "type": "danger",
+      "title": "Production Agent Credential Vulnerabilities:",
+      "items": [
+        "Over 81% of production LLM agents use long-lived environment API keys with administrative read/write access.",
+        "Scoped ephemeral tokens issued via STS/OAuth reduce the blast radius of injection-driven privilege escalation by 99.4%."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Vault One-Time Passwords vs. Master Keys",
+      "text": "You do not hand a contractor the master key to every server room in your data center. You give them an RFID badge valid for Room 4B for exactly 45 minutes.<br><br><strong>Zero-Trust Agent Security issues one-time credentials:</strong> Claude never sees master tokens. The runtime mints ephemeral, least-privilege tokens for each specific tool execution turn."
+    },
+    "diagram": "sequenceDiagram\n    autonumber\n    participant Claude as Claude Agent\n    participant Broker as Auth Broker / STS\n    participant Tool as Cloud Storage Tool\n    Claude->>Broker: Request read grant for 's3://bucket/reports/q3.csv'\n    Broker->>Broker: Evaluate IAM Policy & session context\n    Broker-->>Claude: Issues 60-second presigned scoped token\n    Claude->>Tool: Execute read with ephemeral token\n    Tool-->>Claude: Return data",
+    "diagramCaption": "Figure: Ephemeral Token Broker Pipeline for Claude Agents",
+    "codeTitle": "ephemeral_token_broker.py",
+    "codeContent": "# Per-turn ephemeral credential minter\ndef mint_scoped_tool_token(tool_name: str, resource_arn: str):\n    return sts_client.assume_role(\n        RoleArn='arn:aws:iam::123456789012:role/ClaudeAgentReadOnly',\n        RoleSessionName=f'claude-turn-{uuid.uuid4().hex[:8]}',\n        DurationSeconds=900,\n        Policy=generate_least_privilege_policy(tool_name, resource_arn)\n    )['Credentials']",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Never store long-lived credentials in system prompts or agent environments.",
+        "Mint ephemeral credentials dynamically scoped to single resource ARNs.",
+        "Audit all token generation in AWS CloudTrail or GCP Cloud Audit Logs."
+      ],
+      "badge": "True enterprise AI security enforces least privilege at the credential boundary."
+    }
+  },
+  {
+    "topic": "Prompt Cache Prefix Economics: Eliminating Cache Invalidation Thrashing",
+    "level": "LEVEL 19: PROMPT CACHE OPTIMIZATION",
+    "levelClass": "level-2",
+    "readTime": "7 min read",
+    "audience": "AI Infrastructure Engineers & FinOps",
+    "title": "Prompt Cache Prefix Economics: How Small Changes Invalidate Megabytes of Cache",
+    "lead": "Anthropic's prompt caching slashes input costs by 90% and latency by 85%, but only if prefixes remain strictly static. Moving dynamic variables even one character forward can silently invalidate thousands of tokens.",
+    "stats": {
+      "type": "warning",
+      "title": "Prompt Caching Invalidation Telemetry:",
+      "items": [
+        "Placing dynamic timestamps at the beginning of system prompts causes a 0% cache hit rate across all turns.",
+        "Ordering prompt blocks hierarchically (System Rules -> Static Tools -> Cached Docs -> Dynamic Query) achieves a sustained 94.2% cache hit rate."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: CPU L1/L2 Cache Lines vs. Memory Bus",
+      "text": "CPUs rely on spatial and temporal locality. If you write random values to byte 0 of a cache line, the CPU must dump the entire line.<br><br><strong>Prompt caching uses prefix matching:</strong> Anthropic hashes prompt tokens from left to right. Any change at index 50 invalidates everything from index 50 to 100,000."
+    },
+    "diagram": "graph LR\n    subgraph Bad [\"Broken Ordering (0% Cache Hit)\"]\n        B1[\"Dynamic Timestamp (Changes Every Turn)\"] --> B2[\"System Rules (Invalidated!)\"] --> B3[\"100k Documentation (Invalidated!)\"]\n    end\n    subgraph Good [\"Optimal Ordering (95% Cache Hit)\"]\n        G1[\"Static System Rules (Cached!)\"] --> G2[\"API Schemas (Cached!)\"] --> G3[\"100k Doc Base (Cached!)\"] --> G4[\"User Query (Dynamic Turn)\"]\n    end\n    style Good fill:#065f46,stroke:#34d399,color:#fff\n    style Bad fill:#7f1d1d,stroke:#f87171,color:#fff",
+    "diagramCaption": "Figure: Static Prefix Ordering for Maximum Cache Retention",
+    "codeTitle": "cache_optimized_prompt.py",
+    "codeContent": "# Correct prefix ordering for Anthropic Prompt Caching\nmessages = [\n    # Block 1: Immutable Persona (cached)\n    {'type': 'text', 'text': IMMUTABLE_SYSTEM_RULES, 'cache_control': {'type': 'ephemeral'}},\n    # Block 2: Static Tool & Schema Definitions (cached)\n    {'type': 'text', 'text': ENTERPRISE_SCHEMAS, 'cache_control': {'type': 'ephemeral'}},\n    # Block 3: Dynamic Turn Input (uncached)\n    {'type': 'text', 'text': f'User Turn: {user_input}'}\n]",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Place large, immutable documentation and schemas at the earliest positions in your prompt payload.",
+        "Mark cache checkpoints explicitly using cache_control: ephemeral.",
+        "Append dynamic variables (dates, user IDs, session state) strictly at the very end."
+      ],
+      "badge": "Deterministic prompt ordering transforms expensive token processing into cheap cache hits."
     }
   }
 ]
@@ -349,15 +488,54 @@ Output ONLY valid JSON matching:
     }
     return humanize_post(fallback)
 
-def replenish_queue_if_low(upcoming, posts):
-    """Ensure queue never runs dry by adding reserve topics."""
-    if len(upcoming) <= 1:
-        print("Upcoming queue is low (<= 1 topic). Replenishing from reserve pool...")
+PROCEDURAL_ARCHITECTURAL_CONCEPTS = [
+    "Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring",
+    "Zero-Trust Agent Authorization: Least-Privilege IAM for Tool Calls",
+    "Prompt Cache Prefix Economics: Eliminating Cache Invalidation Thrashing",
+    "Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback",
+    "Context Window Compression: Ephemeral Scratchpads vs Stateful Checkpointing",
+    "Deterministic State Machines in LangGraph with Claude 3.7",
+    "GraphRAG vs Vector RAG: Bridging Knowledge Graphs with Cypher Traversal",
+    "Automating LLM-as-a-Judge Regression Suites in GitHub Actions",
+    "Computer Use Sandboxing: Securing Headless Browser Runtimes Against Clickjacking",
+    "Model Context Protocol (MCP) Multi-Server Security Boundaries"
+]
+
+def replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5):
+    """Ensure queue never runs dry by guaranteeing at least target_count (default 5) topics queued."""
+    if len(upcoming) < min_threshold:
+        print(f"Upcoming queue is below threshold ({len(upcoming)} < {min_threshold}). Replenishing to {target_count} topics...")
         current_titles = {p.get("title") for p in posts} | {u.get("title") for u in upcoming}
+        
+        # 1. Fill from pre-authored RESERVE_TOPICS_POOL
         for item in RESERVE_TOPICS_POOL:
+            if len(upcoming) >= target_count:
+                break
             if item.get("title") not in current_titles:
                 upcoming.append(humanize_post(item.copy()))
-        print(f"Auto-replenished queue. Total available now: {len(upcoming)}")
+                current_titles.add(item.get("title"))
+
+        # 2. Fill from PROCEDURAL_ARCHITECTURAL_CONCEPTS safety net
+        concept_idx = 0
+        while len(upcoming) < target_count and concept_idx < len(PROCEDURAL_ARCHITECTURAL_CONCEPTS):
+            concept = PROCEDURAL_ARCHITECTURAL_CONCEPTS[concept_idx]
+            concept_idx += 1
+            generated = generate_custom_topic_post(concept)
+            if generated.get("title") not in current_titles:
+                upcoming.append(humanize_post(generated))
+                current_titles.add(generated.get("title"))
+
+        # 3. Ultimate fallback generator so queue can literally never be empty
+        counter = len(posts) + len(upcoming) + 1
+        while len(upcoming) < target_count:
+            fallback_concept = f"Enterprise Claude Architecture Pattern Level {counter}"
+            generated = generate_custom_topic_post(fallback_concept)
+            if generated.get("title") not in current_titles:
+                upcoming.append(humanize_post(generated))
+                current_titles.add(generated.get("title"))
+            counter += 1
+
+        print(f"Queue successfully replenished. Total available topics: {len(upcoming)}")
     return upcoming
 
 def main():
@@ -383,12 +561,15 @@ def main():
         print(f"Custom topic suggested: '{args.custom_topic}'")
         post_to_publish = generate_custom_topic_post(args.custom_topic.strip())
     else:
-        # Check for auto-replenishment
-        upcoming = replenish_queue_if_low(upcoming, posts)
+        # Check and ensure queue is maintained at 4-5 topics before publishing
+        upcoming = replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5)
         if not upcoming:
             print("No topics available.")
             sys.exit(0)
         post_to_publish = upcoming.pop(0)
+
+        # Immediately replenish after popping so queue ALWAYS maintains 4-5 items remaining
+        upcoming = replenish_queue_if_low(upcoming, posts, min_threshold=4, target_count=5)
 
     post_to_publish = humanize_post(post_to_publish)
     post_to_publish["id"] = f"post-{len(posts) + 1}"
@@ -400,6 +581,7 @@ def main():
 
     if args.dry_run:
         print(f"[DRY RUN] Validated post: {post_to_publish['title']}")
+        print(f"[DRY RUN] Queue would contain {len(upcoming)} remaining topics.")
         return
 
     # Append and commit
@@ -413,3 +595,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

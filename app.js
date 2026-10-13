@@ -134,7 +134,10 @@ async function showPost(index, shouldScroll = true) {
 
         <!-- Architecture Diagram -->
         <section class="post-section">
-          <h2 class="section-title">Architecture Blueprint &amp; Flow</h2>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <h2 class="section-title" style="margin: 0;">Architecture Blueprint &amp; Flow</h2>
+            <button class="btn-copy-code" onclick="copyDiagram('${post.id}')" title="Copy Mermaid Syntax">Copy Mermaid Diagram</button>
+          </div>
           <div class="diagram-wrapper">
             <div class="mermaid">
 ${post.diagram}
@@ -451,6 +454,8 @@ function copyPostMarkdown(postId) {
   const statsText = post.stats.items.map(i => `• ${stripHtml(i)}`).join('\n');
   const takeawayText = post.takeaway.items.map((it, idx) => `${idx + 1}. ${stripHtml(it)}`).join('\n');
 
+  const diagramSection = post.diagram ? `\n*ARCHITECTURE BLUEPRINT & FLOW:*\n\`\`\`mermaid\n${post.diagram.trim()}\n\`\`\`\n_${post.diagramCaption || ''}_\n` : '';
+
   const markdown = `*Architect Dispatch | ${post.level}*
 ═══════════════════════════════════════════════════════════════
 *${post.title}*
@@ -462,7 +467,7 @@ ${statsText}
 
 *${post.mentalModel.title}*
 ${stripHtml(post.mentalModel.text)}
-
+${diagramSection}
 *PRODUCTION CODE / SPEC:*
 \`\`\`
 ${post.codeContent}
@@ -475,9 +480,23 @@ ${takeawayText}
 `;
 
   navigator.clipboard.writeText(markdown).then(() => {
-    showToast(`Copied "${post.title.slice(0, 22)}..." ready for Slack/Teams`);
+    showToast(`Copied "${post.title.slice(0, 22)}..." (with diagram) for Slack/Teams`);
   }).catch(err => {
     console.error("Copy failed: ", err);
+  });
+}
+
+/**
+ * Copy standalone Mermaid diagram syntax
+ */
+function copyDiagram(postId) {
+  const post = allPosts.find(p => p.id === postId);
+  if (!post || !post.diagram) return;
+
+  navigator.clipboard.writeText(post.diagram.trim()).then(() => {
+    showToast("Copied Mermaid Diagram syntax to clipboard!");
+  }).catch(err => {
+    console.error("Failed to copy diagram:", err);
   });
 }
 
