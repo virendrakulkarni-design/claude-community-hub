@@ -1,40 +1,5 @@
 [
   {
-    "topic": "Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring",
-    "publishedAt": "2026-10-13 20:36 UTC",
-    "level": "DEEP-DIVE: SUB-AGENT MAP-REDUCE: PARALLELIZING 100K-LINE CODEBASE REFACTORING",
-    "levelClass": "level-3",
-    "readTime": "8 min read",
-    "audience": "Senior Engineering Community",
-    "title": "Architecting for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring: Principles, Tradeoffs, and Production Realities",
-    "lead": "Scaling Claude applications with Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring introduces explicit architectural tradeoffs across latency, prompt cache efficiency, and deterministic validation.",
-    "stats": {
-      "type": "info",
-      "title": "Production Metrics for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring:",
-      "items": [
-        "Adopting structured patterns for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring lowers runtime defects by over 45%.",
-        "Proper error boundaries reduce transient downstream microservice failures."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring in Systems Design",
-      "text": "Just as we enforce contracts between microservices, applying Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring to Claude workflows creates clear separation of concerns, deterministic boundaries, and observable state transitions."
-    },
-    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
-    "diagramCaption": "Figure: Operational Pipeline for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring",
-    "codeTitle": "enterprise_scaffold.py",
-    "codeContent": "# Architectural Implementation Scaffold for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring\n# Enforce XML validation and structured contracts across execution boundaries.",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Integrate Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring requirements directly into system prompts.",
-        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
-        "Review edge cases during PR reviews before moving to staging."
-      ],
-      "badge": "Deliberate architecture around Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring ensures reliability at scale."
-    }
-  },
-  {
     "id": "topic-zero-trust-iam",
     "topic": "Zero-Trust Agent Authorization: Least-Privilege IAM for Tool Calls",
     "level": "LEVEL 18: ZERO-TRUST AGENT SECURITY",
@@ -172,6 +137,41 @@
         "Use dynamic tool filtering to include only contextually relevant tool definitions in prompt schemas."
       ],
       "badge": "Federated MCP routing turns chaotic multi-tool fleets into governed enterprise infrastructure."
+    }
+  },
+  {
+    "topic": "Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring",
+    "publishedAt": "2026-11-08 23:56 UTC",
+    "level": "DEEP-DIVE: SUB-AGENT MAP-REDUCE: PARALLELIZING 100K-LINE CODEBASE REFACTORING",
+    "levelClass": "level-3",
+    "readTime": "8 min read",
+    "audience": "Senior Engineering Community",
+    "title": "Architecting for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring: Resilient Patterns and Verification",
+    "lead": "Scaling Claude applications with Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring introduces explicit architectural boundaries across latency, prompt cache efficiency, and deterministic validation.",
+    "stats": {
+      "type": "info",
+      "title": "Production Telemetry for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring:",
+      "items": [
+        "Adopting structured patterns for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring lowers runtime defect rates by over 45%.",
+        "Proper error boundaries eliminate cascading failures across downstream microservices."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring as an Enterprise Interface",
+      "text": "Just as we enforce contracts between microservices, applying Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring to Claude workflows creates clear separation of concerns, deterministic boundaries, and observable state transitions."
+    },
+    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Operational Pipeline for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring",
+    "codeTitle": "enterprise_scaffold.py",
+    "codeContent": "# Architectural Implementation Scaffold for Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring\n# Enforce XML validation and structured contracts across execution boundaries.",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Integrate Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring requirements directly into system prompts.",
+        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
+        "Review edge cases during PR reviews before moving to staging."
+      ],
+      "badge": "Deliberate architecture around Sub-Agent Map-Reduce: Parallelizing 100k-Line Codebase Refactoring ensures reliability at scale."
     }
   }
 ]
