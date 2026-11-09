@@ -1,40 +1,5 @@
 [
   {
-    "topic": "Anthropic Message Batches: 50% FinOps Cost Arbitrage for Asynchronous Processing",
-    "level": "LEVEL 21: BATCH PROCESSING & FINOPS",
-    "levelClass": "level-2",
-    "readTime": "8 min read",
-    "audience": "Cloud Architects & AI FinOps Leaders",
-    "title": "Anthropic Message Batches: Slashing Token Spend by 50% for Bulk Ingestion",
-    "lead": "Processing millions of asynchronous documents or data enrichment queues through standard synchronous API endpoints incurs double the cost and triggers rate-limit throttling. Anthropic Message Batches API halves token costs while processing massive workloads within a 24-hour turnaround.",
-    "stats": {
-      "type": "info",
-      "title": "Batch API Telemetry vs. Synchronous REST:",
-      "items": [
-        "Message Batches provide an instant 50% discount on both input and output tokens across all Claude model families.",
-        "Bulk batch processing avoids standard concurrency rate limits (RPM/TPM), allowing 100,000+ requests per batch dispatch.",
-        "Asynchronous batch pipelines reduce infrastructure spend by 58% by eliminating standing compute workers waiting on idle connections."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: On-Demand Spot Instances vs. Reserved Capacity",
-      "text": "Running overnight batch analytics on peak on-demand EC2 instances wastes budget when spot or scheduled compute costs half as much.<br><br><strong>Message Batches provide spot pricing for token processing:</strong> Submit batch jobs into Anthropic's asynchronous queue, poll or listen for completion webhooks, and process high-volume catalog enrichments at half the token rate."
-    },
-    "diagram": "sequenceDiagram\n autonumber\n participant App as Ingestion Service\n participant S3 as Object Storage\n participant Batch as Anthropic Message Batches API\n App->>S3: Stage 10,000 document tasks (.jsonl)\n App->>Batch: client.messages.batches.create(requests)\n Batch-->>App: batch_id ('msgbatch_01XYZ')\n Note over Batch: Asynchronous Processing (50% Off Token Cost)\n App->>Batch: Polling status (or EventBridge Webhook)\n Batch-->>App: processing_status: 'ended'\n App->>Batch: Download batch results\n App->>S3: Persist structured entity extractions",
-    "diagramCaption": "Figure: Asynchronous Message Batches Pipeline Architecture",
-    "codeTitle": "batch_processor.py",
-    "codeContent": "import anthropic\n\nclient = anthropic.Anthropic()\n\ndef submit_bulk_enrichment(requests_batch: list[dict]):\n \"\"\"Submit up to 10,000 asynchronous turns at 50% token cost reduction.\"\"\"\n batch = client.messages.batches.create(\n requests=requests_batch\n )\n print(f\"Dispatched Batch ID: {batch.id} | Status: {batch.processing_status}\")\n return batch.id\n\ndef retrieve_batch_results(batch_id: str):\n batch = client.messages.batches.retrieve(batch_id)\n if batch.processing_status == \"ended\":\n for result in client.messages.batches.results(batch_id):\n yield result.custom_id, result.result.message.content[0].text",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Migrate offline, ETL, and background evaluation workloads to Message Batches for immediate 50% token savings.",
-        "Batch API requests do not count toward standard synchronous TPM rate limits.",
-        "Store custom_id correlation keys to safely map async outputs back to database records."
-      ],
-      "badge": "Batch processing unlocks enterprise-scale throughput at half the marginal token cost."
-    }
-  },
-  {
     "topic": "Federated MCP Architecture: Distributed Security Boundaries for Multi-Server Fleets",
     "level": "LEVEL 22: DISTRIBUTED TOOL INFRASTRUCTURE",
     "levelClass": "level-3",
@@ -173,5 +138,40 @@
       "badge": "GraphRAG bridges semantic similarity with deterministic relational logic."
     },
     "publishedAt": "2026-11-09 12:04 UTC"
+  },
+  {
+    "topic": "Anthropic Message Batches: 50% FinOps Cost Arbitrage for Asynchronous Processing",
+    "level": "LEVEL 21: BATCH PROCESSING & FINOPS",
+    "levelClass": "level-2",
+    "readTime": "8 min read",
+    "audience": "Cloud Architects & AI FinOps Leaders",
+    "title": "Anthropic Message Batches: Slashing Token Spend by 50% for Bulk Ingestion",
+    "lead": "Processing millions of asynchronous documents or data enrichment queues through standard synchronous API endpoints incurs double the cost and triggers rate-limit throttling. Anthropic Message Batches API halves token costs while processing massive workloads within a 24-hour turnaround.",
+    "stats": {
+      "type": "info",
+      "title": "Batch API Telemetry vs. Synchronous REST:",
+      "items": [
+        "Message Batches provide an instant 50% discount on both input and output tokens across all Claude model families.",
+        "Bulk batch processing avoids standard concurrency rate limits (RPM/TPM), allowing 100,000+ requests per batch dispatch.",
+        "Asynchronous batch pipelines reduce infrastructure spend by 58% by eliminating standing compute workers waiting on idle connections."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: On-Demand Spot Instances vs. Reserved Capacity",
+      "text": "Running overnight batch analytics on peak on-demand EC2 instances wastes budget when spot or scheduled compute costs half as much.<br><br><strong>Message Batches provide spot pricing for token processing:</strong> Submit batch jobs into Anthropic's asynchronous queue, poll or listen for completion webhooks, and process high-volume catalog enrichments at half the token rate."
+    },
+    "diagram": "sequenceDiagram\n autonumber\n participant App as Ingestion Service\n participant S3 as Object Storage\n participant Batch as Anthropic Message Batches API\n App->>S3: Stage 10,000 document tasks (.jsonl)\n App->>Batch: client.messages.batches.create(requests)\n Batch-->>App: batch_id ('msgbatch_01XYZ')\n Note over Batch: Asynchronous Processing (50% Off Token Cost)\n App->>Batch: Polling status (or EventBridge Webhook)\n Batch-->>App: processing_status: 'ended'\n App->>Batch: Download batch results\n App->>S3: Persist structured entity extractions",
+    "diagramCaption": "Figure: Asynchronous Message Batches Pipeline Architecture",
+    "codeTitle": "batch_processor.py",
+    "codeContent": "import anthropic\n\nclient = anthropic.Anthropic()\n\ndef submit_bulk_enrichment(requests_batch: list[dict]):\n \"\"\"Submit up to 10,000 asynchronous turns at 50% token cost reduction.\"\"\"\n batch = client.messages.batches.create(\n requests=requests_batch\n )\n print(f\"Dispatched Batch ID: {batch.id} | Status: {batch.processing_status}\")\n return batch.id\n\ndef retrieve_batch_results(batch_id: str):\n batch = client.messages.batches.retrieve(batch_id)\n if batch.processing_status == \"ended\":\n for result in client.messages.batches.results(batch_id):\n yield result.custom_id, result.result.message.content[0].text",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Migrate offline, ETL, and background evaluation workloads to Message Batches for immediate 50% token savings.",
+        "Batch API requests do not count toward standard synchronous TPM rate limits.",
+        "Store custom_id correlation keys to safely map async outputs back to database records."
+      ],
+      "badge": "Batch processing unlocks enterprise-scale throughput at half the marginal token cost."
+    }
   }
 ]
