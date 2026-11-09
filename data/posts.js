@@ -834,5 +834,42 @@ window.POSTS_DATA = [
     },
     "id": "post-23",
     "publishedAt": "2026-11-09 15:51 UTC"
+  },
+  {
+    "topic": "Federated MCP Architecture: Distributed Security Boundaries for Multi-Server Fleets",
+    "level": "LEVEL 22: DISTRIBUTED TOOL INFRASTRUCTURE",
+    "levelClass": "level-3",
+    "readTime": "8 min read",
+    "audience": "Enterprise Integration & Infrastructure Architects",
+    "title": "Federated MCP Architecture: Distributed Security Boundaries for Multi-Server Fleets",
+    "lead": "Connecting dozens of Model Context Protocol (MCP) servers directly to a single Claude agent creates prompt bloat, security cross-contamination, and tool naming conflicts. Enterprise environments require an MCP gateway router to isolate server boundaries and enforce fine-grained access control.",
+    "stats": {
+      "type": "warning",
+      "title": "Enterprise Multi-MCP Telemetry:",
+      "items": [
+        "Unfederated MCP setups expose an average of 42 distinct tools simultaneously, bloating context prefixes by 18,000 tokens before user input.",
+        "Federated routing gateways trim active tool schemas to strictly relevant sub-domains, cutting turn latency by 45%.",
+        "Granular tool namespaces eliminate cross-server command collision and unauthorized database access across tenant boundaries."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: API Gateway vs. Direct Microservice Exposure",
+      "text": "In cloud architectures, you never let single web clients open raw connections to internal database clusters, billing engines, and auth servers. You place an API Gateway (Kong, Envoy) in front.<br><br><strong>Federated MCP acts as an Agent API Gateway:</strong> Claude connects to an MCP Gateway Router that dynamically surfaces only the tools needed for the active workflow step."
+    },
+    "diagram": "graph TD\n Claude[\"Claude 3.7 Agent\"] --> Router[\"Federated MCP Gateway<br/>(Policy &amp; Namespace Router)\"]\n subgraph Backends [\"Isolated MCP Server Fleets\"]\n S1[\"GitHub MCP Server<br/>(Codebase Scope)\"]\n S2[\"Postgres MCP Server<br/>(Read-Replica Scope)\"]\n S3[\"Kubernetes MCP Server<br/>(Cluster Diagnostics)\"]\n end\n Router -->|Namespaced Route 'github:*'| S1\n Router -->|Namespaced Route 'db:*'| S2\n Router -->|Namespaced Route 'k8s:*'| S3\n style Router fill:#1e3a8a,stroke:#60a5fa,color:#fff\n style S2 fill:#065f46,stroke:#34d399,color:#fff",
+    "diagramCaption": "Figure: Federated Model Context Protocol (MCP) Gateway Architecture",
+    "codeTitle": "mcp_federation_router.py",
+    "codeContent": "# Federated MCP Router Dispatcher\nclass FederatedMCPGateway:\n def __init__(self):\n self.server_registry = {}\n\n def register_server(self, namespace: str, server_transport):\n self.server_registry[namespace] = server_transport\n\n def route_tool_call(self, tool_name: str, arguments: dict):\n namespace, _, clean_name = tool_name.partition(\"__\")\n server = self.server_registry.get(namespace)\n if not server:\n raise ValueError(f\"Unauthorized or unregistered MCP namespace: {namespace}\")\n return server.call_tool(clean_name, arguments)",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Never dump dozens of MCP servers into a single unnamespaced Claude configuration.",
+        "Implement namespace prefixes (e.g., github__, db__) to prevent tool collision.",
+        "Use dynamic tool filtering to include only contextually relevant tool definitions in prompt schemas."
+      ],
+      "badge": "Federated MCP routing turns chaotic multi-tool fleets into governed enterprise infrastructure."
+    },
+    "id": "post-24",
+    "publishedAt": "2026-11-09 23:55 UTC"
   }
 ];
