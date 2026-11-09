@@ -724,5 +724,41 @@ window.POSTS_DATA = [
     },
     "publishedAt": "2026-11-09 03:49 UTC",
     "id": "post-20"
+  },
+  {
+    "id": "post-21",
+    "topic": "Zero-Trust Agent Authorization: Least-Privilege IAM for Tool Calls",
+    "level": "LEVEL 18: ZERO-TRUST AGENT SECURITY",
+    "levelClass": "level-3",
+    "readTime": "8 min read",
+    "audience": "DevSecOps Engineers & Cloud Architects",
+    "title": "Zero-Trust Agent Authorization: Least-Privilege IAM and Ephemeral Tool Grants",
+    "lead": "Giving AI agents persistent, broad API credentials invites catastrophic credential exfiltration. Enterprise systems require short-lived, cryptographically bounded tool tokens issued on a per-step basis.",
+    "stats": {
+      "type": "danger",
+      "title": "Production Agent Credential Vulnerabilities:",
+      "items": [
+        "Over 81% of production LLM agents use long-lived environment API keys with administrative read/write access.",
+        "Scoped ephemeral tokens issued via STS/OAuth reduce the blast radius of injection-driven privilege escalation by 99.4%."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Vault One-Time Passwords vs. Master Keys",
+      "text": "You do not hand a contractor the master key to every server room in your data center. You give them an RFID badge valid for Room 4B for exactly 45 minutes.<br><br><strong>Zero-Trust Agent Security issues one-time credentials:</strong> Claude never sees master tokens. The runtime mints ephemeral, least-privilege tokens for each specific tool execution turn."
+    },
+    "diagram": "sequenceDiagram\n autonumber\n participant Claude as Claude Agent\n participant Broker as Auth Broker / STS\n participant Tool as Cloud Storage Tool\n Claude->>Broker: Request read grant for 's3://bucket/reports/q3.csv'\n Broker->>Broker: Evaluate IAM Policy & session context\n Broker-->>Claude: Issues 60-second presigned scoped token\n Claude->>Tool: Execute read with ephemeral token\n Tool-->>Claude: Return data",
+    "diagramCaption": "Figure: Ephemeral Token Broker Pipeline for Claude Agents",
+    "codeTitle": "ephemeral_token_broker.py",
+    "codeContent": "# Per-turn ephemeral credential minter\ndef mint_scoped_tool_token(tool_name: str, resource_arn: str):\n return sts_client.assume_role(\n RoleArn='arn:aws:iam::123456789012:role/ClaudeAgentReadOnly',\n RoleSessionName=f'claude-turn-{uuid.uuid4().hex[:8]}',\n DurationSeconds=900,\n Policy=generate_least_privilege_policy(tool_name, resource_arn)\n )['Credentials']",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Never store long-lived credentials in system prompts or agent environments.",
+        "Mint ephemeral credentials dynamically scoped to single resource ARNs.",
+        "Audit all token generation in AWS CloudTrail or GCP Cloud Audit Logs."
+      ],
+      "badge": "True enterprise AI security enforces least privilege at the credential boundary."
+    },
+    "publishedAt": "2026-11-09 05:56 UTC"
   }
 ];
