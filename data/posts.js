@@ -943,5 +943,41 @@ window.POSTS_DATA = [
       "badge": "Intelligent orchestration delivers frontier performance at scale."
     },
     "id": "post-26"
+  },
+  {
+    "topic": "Graph Engineering & Knowledge Graphs with Claude",
+    "level": "LEVEL 7: GRAPH ARCHITECTURE & REASONING",
+    "levelClass": "level-3",
+    "readTime": "9 min read",
+    "audience": "Data Architects & Senior Graph Engineers",
+    "title": "Graph Engineering: Why Vector RAG Fails on Multi-Hop Queries and How GraphRAG Solves It",
+    "lead": "Vector similarity search finds direct text matches effectively, but cannot trace multi-hop relationships across interconnected entities. Graph engineering combines Neo4j knowledge graphs with Claude's structured reasoning.",
+    "stats": {
+      "type": "warning",
+      "title": "Vector Search Blindspots in Complex Systems:",
+      "items": [
+        "Standard vector RAG accuracy drops below 28% on multi-hop questions (such as tracing upstream service dependencies to an expired SSL cert).",
+        "Graph-augmented LLM pipelines (GraphRAG) boost multi-hop relationship extraction accuracy from 34% to 89% while reducing context hallucinations."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: The Family Tree vs. A Bag of Words",
+      "text": "Vector search treats documents like a pile of post-it notes in a blender, locating notes with similar keywords. To find a second cousin twice removed, semantic similarity does not help; you need graph edge traversal.<br><br><strong>Graph Engineering turns Claude into a Graph Query Engine:</strong> Claude generates Cypher queries, traverses relationships, and reasons over interconnected enterprise knowledge."
+    },
+    "diagram": "graph LR\n subgraph RAG [\"Vector RAG (Flat Similarity)\"]\n Q[\"User Query\"] -.-> V1[\"Chunk A\"]\n Q -.-> V2[\"Chunk B (Missing Connection!)\"]\n end\n subgraph GraphRAG [\"Graph Engineering (Entity-Relationship)\"]\n E1[\"Service A\"] -->|DEPENDS_ON| E2[\"Database B\"]\n E2 -->|HOSTED_IN| E3[\"VPC Us-East-1\"]\n E3 -->|MANAGED_BY| E4[\"Team Security\"]\n Claude[\"Claude Cypher Agent\"] -->|Traverses Path| E1\n end\n style Claude fill:#1e3a8a,stroke:#60a5fa,color:#fff\n style E4 fill:#065f46,stroke:#34d399,color:#fff",
+    "diagramCaption": "Figure: Flat Vector Embeddings vs. Connected GraphRAG Traversal",
+    "codeTitle": "cypher_graph_agent.py",
+    "codeContent": "from neo4j import GraphDatabase\nimport anthropic\n\nclient = anthropic.Anthropic()\n\ndef generate_and_execute_cypher(natural_query: str, schema_description: str):\n prompt = f\"\"\"Translate this user question into a read-only Cypher query.\\nSchema: {schema_description}\\nQuestion: {natural_query}\\nOutput only inside <cypher_query> tags.\"\"\"\n response = client.messages.create(\n model=\"claude-3-7-sonnet-20250219\",\n max_tokens=1024,\n messages=[{\"role\": \"user\", \"content\": prompt}]\n )\n # Extract Cypher and execute against Neo4j read replica\n cypher = response.content[0].text.split(\"<cypher_query>\")[1].split(\"</cypher_query>\")[0]\n return db_driver.execute_query(cypher)",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Avoid relying solely on vector embeddings for relationship-heavy enterprise queries.",
+        "Extract entities and relationships into a graph database (Neo4j, AWS Neptune) during ingestion ETL.",
+        "Have Claude generate Cypher or Gremlin queries to perform structured path traversals."
+      ],
+      "badge": "GraphRAG bridges semantic similarity with deterministic relational logic."
+    },
+    "publishedAt": "2026-11-09 12:04 UTC",
+    "id": "post-27"
   }
 ];
