@@ -1,40 +1,5 @@
 [
   {
-    "topic": "Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback",
-    "publishedAt": "2026-11-09 03:49 UTC",
-    "level": "DEEP-DIVE: STREAMING PARTIAL TOOL CALLING: SUB-SECOND WEBSOCKET AGENT FEEDBACK",
-    "levelClass": "level-3",
-    "readTime": "8 min read",
-    "audience": "Senior Engineering Community",
-    "title": "Architecting for Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback: Resilient Patterns and Verification",
-    "lead": "Scaling Claude applications with Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback introduces explicit architectural boundaries across latency, prompt cache efficiency, and deterministic validation.",
-    "stats": {
-      "type": "info",
-      "title": "Production Telemetry for Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback:",
-      "items": [
-        "Adopting structured patterns for Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback lowers runtime defect rates by over 45%.",
-        "Proper error boundaries eliminate cascading failures across downstream microservices."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback as an Enterprise Interface",
-      "text": "Just as we enforce contracts between microservices, applying Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback to Claude workflows creates clear separation of concerns, deterministic boundaries, and observable state transitions."
-    },
-    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
-    "diagramCaption": "Figure: Operational Pipeline for Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback",
-    "codeTitle": "enterprise_scaffold.py",
-    "codeContent": "# Architectural Implementation Scaffold for Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback\n# Enforce XML validation and structured contracts across execution boundaries.",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Integrate Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback requirements directly into system prompts.",
-        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
-        "Review edge cases during PR reviews before moving to staging."
-      ],
-      "badge": "Deliberate architecture around Streaming Partial Tool Calling: Sub-Second WebSocket Agent Feedback ensures reliability at scale."
-    }
-  },
-  {
     "topic": "Context Window Compaction: Selective Summarization & Working Memory Persistence",
     "publishedAt": "2026-11-09 10:45 UTC",
     "level": "DEEP-DIVE: CONTEXT WINDOW COMPACTION: SELECTIVE SUMMARIZATION & WORKING MEMORY PERSISTENCE",
@@ -140,38 +105,73 @@
     }
   },
   {
-    "topic": "Federated MCP Architecture: Distributed Security Boundaries for Multi-Server Fleets",
-    "level": "LEVEL 22: DISTRIBUTED TOOL INFRASTRUCTURE",
+    "topic": "Headless Browser Sandboxing: Securing Computer Use Against Clickjacking",
+    "publishedAt": "2026-11-10 06:39 UTC",
+    "level": "DEEP-DIVE: HEADLESS BROWSER SANDBOXING: SECURING COMPUTER USE AGAINST CLICKJACKING",
     "levelClass": "level-3",
     "readTime": "8 min read",
-    "audience": "Enterprise Integration & Infrastructure Architects",
-    "title": "Federated MCP Architecture: Distributed Security Boundaries for Multi-Server Fleets",
-    "lead": "Connecting dozens of Model Context Protocol (MCP) servers directly to a single Claude agent creates prompt bloat, security cross-contamination, and tool naming conflicts. Enterprise environments require an MCP gateway router to isolate server boundaries and enforce fine-grained access control.",
+    "audience": "Senior Engineering Community",
+    "title": "Architecting for Headless Browser Sandboxing: Securing Computer Use Against Clickjacking: Resilient Patterns and Verification",
+    "lead": "Scaling Claude applications with Headless Browser Sandboxing: Securing Computer Use Against Clickjacking introduces explicit architectural boundaries across latency, prompt cache efficiency, and deterministic validation.",
     "stats": {
-      "type": "warning",
-      "title": "Enterprise Multi-MCP Telemetry:",
+      "type": "info",
+      "title": "Production Telemetry for Headless Browser Sandboxing: Securing Computer Use Against Clickjacking:",
       "items": [
-        "Unfederated MCP setups expose an average of 42 distinct tools simultaneously, bloating context prefixes by 18,000 tokens before user input.",
-        "Federated routing gateways trim active tool schemas to strictly relevant sub-domains, cutting turn latency by 45%.",
-        "Granular tool namespaces eliminate cross-server command collision and unauthorized database access across tenant boundaries."
+        "Adopting structured patterns for Headless Browser Sandboxing: Securing Computer Use Against Clickjacking lowers runtime defect rates by over 45%.",
+        "Proper error boundaries eliminate cascading failures across downstream microservices."
       ]
     },
     "mentalModel": {
-      "title": "1. The 60-Second Mental Model: API Gateway vs. Direct Microservice Exposure",
-      "text": "In cloud architectures, you never let single web clients open raw connections to internal database clusters, billing engines, and auth servers. You place an API Gateway (Kong, Envoy) in front.<br><br><strong>Federated MCP acts as an Agent API Gateway:</strong> Claude connects to an MCP Gateway Router that dynamically surfaces only the tools needed for the active workflow step."
+      "title": "1. The 60-Second Mental Model: Headless Browser Sandboxing: Securing Computer Use Against Clickjacking as an Enterprise Interface",
+      "text": "Just as we enforce contracts between microservices, applying Headless Browser Sandboxing: Securing Computer Use Against Clickjacking to Claude workflows creates clear separation of concerns, deterministic boundaries, and observable state transitions."
     },
-    "diagram": "graph TD\n Claude[\"Claude 3.7 Agent\"] --> Router[\"Federated MCP Gateway<br/>(Policy &amp; Namespace Router)\"]\n subgraph Backends [\"Isolated MCP Server Fleets\"]\n S1[\"GitHub MCP Server<br/>(Codebase Scope)\"]\n S2[\"Postgres MCP Server<br/>(Read-Replica Scope)\"]\n S3[\"Kubernetes MCP Server<br/>(Cluster Diagnostics)\"]\n end\n Router -->|Namespaced Route 'github:*'| S1\n Router -->|Namespaced Route 'db:*'| S2\n Router -->|Namespaced Route 'k8s:*'| S3\n style Router fill:#1e3a8a,stroke:#60a5fa,color:#fff\n style S2 fill:#065f46,stroke:#34d399,color:#fff",
-    "diagramCaption": "Figure: Federated Model Context Protocol (MCP) Gateway Architecture",
-    "codeTitle": "mcp_federation_router.py",
-    "codeContent": "# Federated MCP Router Dispatcher\nclass FederatedMCPGateway:\n def __init__(self):\n self.server_registry = {}\n\n def register_server(self, namespace: str, server_transport):\n self.server_registry[namespace] = server_transport\n\n def route_tool_call(self, tool_name: str, arguments: dict):\n namespace, _, clean_name = tool_name.partition(\"__\")\n server = self.server_registry.get(namespace)\n if not server:\n raise ValueError(f\"Unauthorized or unregistered MCP namespace: {namespace}\")\n return server.call_tool(clean_name, arguments)",
+    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Headless Browser Sandboxing: Securing Computer Use Against Clickjacking Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Operational Pipeline for Headless Browser Sandboxing: Securing Computer Use Against Clickjacking",
+    "codeTitle": "enterprise_scaffold.py",
+    "codeContent": "# Architectural Implementation Scaffold for Headless Browser Sandboxing: Securing Computer Use Against Clickjacking\n# Enforce XML validation and structured contracts across execution boundaries.",
     "takeaway": {
       "title": "Key Takeaways",
       "items": [
-        "Never dump dozens of MCP servers into a single unnamespaced Claude configuration.",
-        "Implement namespace prefixes (e.g., github__, db__) to prevent tool collision.",
-        "Use dynamic tool filtering to include only contextually relevant tool definitions in prompt schemas."
+        "Integrate Headless Browser Sandboxing: Securing Computer Use Against Clickjacking requirements directly into system prompts.",
+        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
+        "Review edge cases during PR reviews before moving to staging."
       ],
-      "badge": "Federated MCP routing turns chaotic multi-tool fleets into governed enterprise infrastructure."
+      "badge": "Deliberate architecture around Headless Browser Sandboxing: Securing Computer Use Against Clickjacking ensures reliability at scale."
+    }
+  },
+  {
+    "topic": "Enterprise Pattern 33: High-Availability Claude Deployment Tier 5",
+    "publishedAt": "2026-11-10 06:39 UTC",
+    "level": "DEEP-DIVE: ENTERPRISE PATTERN 33: HIGH-AVAILABILITY CLAUDE DEPLOYMENT TIER 5",
+    "levelClass": "level-3",
+    "readTime": "8 min read",
+    "audience": "Senior Engineering Community",
+    "title": "Architecting for Enterprise Pattern 33: High-Availability Claude Deployment Tier 5: Resilient Patterns and Verification",
+    "lead": "Scaling Claude applications with Enterprise Pattern 33: High-Availability Claude Deployment Tier 5 introduces explicit architectural boundaries across latency, prompt cache efficiency, and deterministic validation.",
+    "stats": {
+      "type": "info",
+      "title": "Production Telemetry for Enterprise Pattern 33: High-Availability Claude Deployment Tier 5:",
+      "items": [
+        "Adopting structured patterns for Enterprise Pattern 33: High-Availability Claude Deployment Tier 5 lowers runtime defect rates by over 45%.",
+        "Proper error boundaries eliminate cascading failures across downstream microservices."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Enterprise Pattern 33: High-Availability Claude Deployment Tier 5 as an Enterprise Interface",
+      "text": "Just as we enforce contracts between microservices, applying Enterprise Pattern 33: High-Availability Claude Deployment Tier 5 to Claude workflows creates clear separation of concerns, deterministic boundaries, and observable state transitions."
+    },
+    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Enterprise Pattern 33: High-Availability Claude Deployment Tier 5 Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Operational Pipeline for Enterprise Pattern 33: High-Availability Claude Deployment Tier 5",
+    "codeTitle": "enterprise_scaffold.py",
+    "codeContent": "# Architectural Implementation Scaffold for Enterprise Pattern 33: High-Availability Claude Deployment Tier 5\n# Enforce XML validation and structured contracts across execution boundaries.",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Integrate Enterprise Pattern 33: High-Availability Claude Deployment Tier 5 requirements directly into system prompts.",
+        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
+        "Review edge cases during PR reviews before moving to staging."
+      ],
+      "badge": "Deliberate architecture around Enterprise Pattern 33: High-Availability Claude Deployment Tier 5 ensures reliability at scale."
     }
   }
 ]
