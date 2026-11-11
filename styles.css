@@ -688,6 +688,10 @@ body.light-theme .top-nav {
   border-radius: 3px;
 }
 
+.tab-btn.level-easy .tab-num { color: #38bdf8; background: rgba(56, 189, 248, 0.12); }
+.tab-btn.level-medium .tab-num { color: #fbbf24; background: rgba(251, 191, 36, 0.12); }
+.tab-btn.level-advanced .tab-num { color: #f87171; background: rgba(248, 113, 113, 0.12); }
+
 /* ==========================================================================
    RIGHT PANE: WIDE ACTIVE ARTICLE CARD
    ========================================================================== */

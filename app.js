@@ -309,8 +309,9 @@ function renderMobilePills() {
 
   container.innerHTML = allPosts.map((post, idx) => {
     const diffLabel = post.level || 'Medium';
+    const levelClass = post.levelClass || `level-${diffLabel.toLowerCase()}`;
     return `
-      <button class="tab-btn ${idx === currentIndex ? 'active' : ''}" onclick="showPost(${idx})">
+      <button class="tab-btn ${idx === currentIndex ? 'active' : ''} ${escapeHtml(levelClass)}" onclick="showPost(${idx})">
         <span class="tab-num">#${idx + 1}</span>
         <span class="tab-label">${escapeHtml(diffLabel)}</span>
       </button>

@@ -1,7 +1,9 @@
-﻿# Helper script to queue a custom topic/keyword to upcoming_topics.json
+# Helper script to queue a custom topic/keyword to upcoming_topics.json
 param (
     [Parameter(Mandatory=$true)]
-    [string]$Topic
+    [string]$Topic,
+    [ValidateSet("Easy", "Medium", "Advanced")]
+    [string]$Difficulty = "Advanced"
 )
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -14,12 +16,13 @@ if (-not (Test-Path $upcomingJsonPath)) {
 }
 
 $upcoming = Get-Content $upcomingJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$levelClass = "level-$($Difficulty.ToLower())"
 
 $newEntry = [PSCustomObject]@{
     id = "custom-$((Get-Date).Ticks)"
     topic = $Topic
-    level = "Advanced"
-    levelClass = "level-advanced"
+    level = $Difficulty
+    levelClass = $levelClass
     readTime = "8 min read"
     audience = "Enterprise Engineers & Architects"
     title = "$Topic in Enterprise Claude Architecture"
@@ -50,10 +53,10 @@ $newEntry = [PSCustomObject]@{
     }
 }
 
-# Prepend so it is next in line!
+# Prepend so it is next in line
 $updatedUpcoming = @($newEntry) + @($upcoming)
 $jsonUpcoming = $updatedUpcoming | ConvertTo-Json -Depth 15
 [System.IO.File]::WriteAllText($upcomingJsonPath, $jsonUpcoming, [System.Text.Encoding]::UTF8)
 
-Write-Host "✅ Successfully queued '$Topic' as the NEXT post to publish!" -ForegroundColor Green
+Write-Host "[OK] Successfully queued '$Topic' ($Difficulty) as the next post to publish." -ForegroundColor Green
 Write-Host "Total queued topics: $($updatedUpcoming.Count)" -ForegroundColor Cyan
