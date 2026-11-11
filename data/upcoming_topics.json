@@ -1,40 +1,5 @@
 [
   {
-    "topic": "Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts",
-    "publishedAt": "2026-11-09 23:55 UTC",
-    "level": "DEEP-DIVE: AUTOMATED EVALUATION BASELINES: CONTINUOUS RED-TEAMING FOR PRODUCTION PROMPTS",
-    "levelClass": "level-3",
-    "readTime": "8 min read",
-    "audience": "Senior Engineering Community",
-    "title": "Enterprise Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts: Distributed Failure Modes and Observability",
-    "lead": "Deploying Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts in mission-critical agentic systems requires telemetry-backed guardrails, structured reflection, and strict execution timeouts.",
-    "stats": {
-      "type": "info",
-      "title": "Reliability Benchmarks for Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts:",
-      "items": [
-        "Automated state checks around Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts intercept 99.2% of malformed payloads before database mutations.",
-        "End-to-end tracing pinpoints latency bottlenecks and eliminates redundant reasoning loops."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts as an Observability Gate",
-      "text": "Treat Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts as an instrumented gateway: validate all inputs at the boundary, enforce strict execution timeouts, and isolate fault domains."
-    },
-    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
-    "diagramCaption": "Figure: Operational Pipeline for Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts",
-    "codeTitle": "enterprise_scaffold.py",
-    "codeContent": "# Architectural Implementation Scaffold for Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts\n# Enforce XML validation and structured contracts across execution boundaries.",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Integrate Automated Evaluation Baselines: Continuous Red-Teaming for Production Prompts requirements directly into system prompts.",
-        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
-        "Review edge cases during PR reviews before moving to staging."
-      ],
-      "badge": "Resilient systems isolate failures before they propagate."
-    }
-  },
-  {
     "topic": "Headless Browser Sandboxing: Securing Computer Use Against Clickjacking",
     "publishedAt": "2026-11-10 06:39 UTC",
     "level": "DEEP-DIVE: HEADLESS BROWSER SANDBOXING: SECURING COMPUTER USE AGAINST CLICKJACKING",
@@ -103,40 +68,5 @@
       ],
       "badge": "Deliberate architecture around Enterprise Pattern 33: High-Availability Claude Deployment Tier 5 ensures reliability at scale."
     }
-  },
-  {
-    "topic": "Graph Engineering & Knowledge Graphs with Claude",
-    "level": "LEVEL 7: GRAPH ARCHITECTURE & REASONING",
-    "levelClass": "level-3",
-    "readTime": "9 min read",
-    "audience": "Data Architects & Senior Graph Engineers",
-    "title": "Graph Engineering: Why Vector RAG Fails on Multi-Hop Queries and How GraphRAG Solves It",
-    "lead": "Vector similarity search finds direct text matches effectively, but cannot trace multi-hop relationships across interconnected entities. Graph engineering combines Neo4j knowledge graphs with Claude's structured reasoning.",
-    "stats": {
-      "type": "warning",
-      "title": "Vector Search Blindspots in Complex Systems:",
-      "items": [
-        "Standard vector RAG accuracy drops below 28% on multi-hop questions (such as tracing upstream service dependencies to an expired SSL cert).",
-        "Graph-augmented LLM pipelines (GraphRAG) boost multi-hop relationship extraction accuracy from 34% to 89% while reducing context hallucinations."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: The Family Tree vs. A Bag of Words",
-      "text": "Vector search treats documents like a pile of post-it notes in a blender, locating notes with similar keywords. To find a second cousin twice removed, semantic similarity does not help; you need graph edge traversal.<br><br><strong>Graph Engineering turns Claude into a Graph Query Engine:</strong> Claude generates Cypher queries, traverses relationships, and reasons over interconnected enterprise knowledge."
-    },
-    "diagram": "graph LR\n subgraph RAG [\"Vector RAG (Flat Similarity)\"]\n Q[\"User Query\"] -.-> V1[\"Chunk A\"]\n Q -.-> V2[\"Chunk B (Missing Connection!)\"]\n end\n subgraph GraphRAG [\"Graph Engineering (Entity-Relationship)\"]\n E1[\"Service A\"] -->|DEPENDS_ON| E2[\"Database B\"]\n E2 -->|HOSTED_IN| E3[\"VPC Us-East-1\"]\n E3 -->|MANAGED_BY| E4[\"Team Security\"]\n Claude[\"Claude Cypher Agent\"] -->|Traverses Path| E1\n end\n style Claude fill:#1e3a8a,stroke:#60a5fa,color:#fff\n style E4 fill:#065f46,stroke:#34d399,color:#fff",
-    "diagramCaption": "Figure: Flat Vector Embeddings vs. Connected GraphRAG Traversal",
-    "codeTitle": "cypher_graph_agent.py",
-    "codeContent": "from neo4j import GraphDatabase\nimport anthropic\n\nclient = anthropic.Anthropic()\n\ndef generate_and_execute_cypher(natural_query: str, schema_description: str):\n prompt = f\"\"\"Translate this user question into a read-only Cypher query.\\nSchema: {schema_description}\\nQuestion: {natural_query}\\nOutput only inside <cypher_query> tags.\"\"\"\n response = client.messages.create(\n model=\"claude-3-7-sonnet-20250219\",\n max_tokens=1024,\n messages=[{\"role\": \"user\", \"content\": prompt}]\n )\n # Extract Cypher and execute against Neo4j read replica\n cypher = response.content[0].text.split(\"<cypher_query>\")[1].split(\"</cypher_query>\")[0]\n return db_driver.execute_query(cypher)",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Avoid relying solely on vector embeddings for relationship-heavy enterprise queries.",
-        "Extract entities and relationships into a graph database (Neo4j, AWS Neptune) during ingestion ETL.",
-        "Have Claude generate Cypher or Gremlin queries to perform structured path traversals."
-      ],
-      "badge": "GraphRAG bridges semantic similarity with deterministic relational logic."
-    },
-    "publishedAt": "2026-11-10 21:20 UTC"
   }
 ]
