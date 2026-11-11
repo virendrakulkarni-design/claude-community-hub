@@ -35,6 +35,29 @@ def remove_emojis(text):
     cleaned = emoji_pattern.sub("", text)
     return re.sub(r' +', ' ', cleaned).strip()
 
+VALID_LEVELS = {"Easy", "Medium", "Advanced"}
+LEVEL_CLASSES = {
+    "Easy": "level-easy",
+    "Medium": "level-medium",
+    "Advanced": "level-advanced"
+}
+
+def normalize_level(level_str: str) -> tuple[str, str]:
+    """Map any level string into one of the 3 canonical categories: Easy, Medium, Advanced."""
+    if not level_str or not isinstance(level_str, str):
+        return "Medium", "level-medium"
+    s = level_str.strip()
+    if s in VALID_LEVELS:
+        return s, LEVEL_CLASSES[s]
+    s_lower = s.lower()
+    if "easy" in s_lower or "foundations" in s_lower or "beginner" in s_lower:
+        return "Easy", "level-easy"
+    elif "medium" in s_lower or "intermediate" in s_lower or "optimization" in s_lower or "concurrency" in s_lower or "resilient" in s_lower:
+        return "Medium", "level-medium"
+    elif "advance" in s_lower or "deep-dive" in s_lower or "security" in s_lower or "adversarial" in s_lower or "weight" in s_lower or "graph" in s_lower:
+        return "Advanced", "level-advanced"
+    return "Medium", "level-medium"
+
 def humanize_post(post):
     """
     Apply Humanizer skill constraints:
@@ -48,6 +71,11 @@ def humanize_post(post):
     for field in ["title", "lead", "level", "readTime", "audience", "diagramCaption", "diagram", "codeContent", "codeTitle"]:
         if field in post and isinstance(post[field], str):
             post[field] = remove_emojis(post[field])
+
+    # Normalize difficulty level into 3 canonical categories: Easy, Medium, Advanced
+    lvl, lvl_class = normalize_level(post.get("level", ""))
+    post["level"] = lvl
+    post["levelClass"] = lvl_class
 
     # Clean stats block
     if "stats" in post and isinstance(post["stats"], dict):
@@ -80,8 +108,8 @@ def humanize_post(post):
 KEYWORD_TEMPLATES = {
     "graph": {
         "topic": "Graph Engineering & Knowledge Graphs with Claude",
-        "level": "LEVEL 7: GRAPH ARCHITECTURE & REASONING",
-        "levelClass": "level-3",
+        "level": "Advanced",
+        "levelClass": "level-advanced",
         "readTime": "9 min read",
         "audience": "Data Architects & Senior Graph Engineers",
         "title": "Graph Engineering: Why Vector RAG Fails on Multi-Hop Queries and How GraphRAG Solves It",
@@ -114,8 +142,8 @@ KEYWORD_TEMPLATES = {
     },
     "certification": {
         "topic": "Claude Certifications & Enterprise AI Competency",
-        "level": "LEVEL 6: ENTERPRISE STANDARDS & CERTIFICATIONS",
-        "levelClass": "level-2",
+        "level": "Medium",
+        "levelClass": "level-medium",
         "readTime": "8 min read",
         "audience": "Engineering Leaders, Architects & Tech Leads",
         "title": "Demystifying Claude Certifications: The Enterprise Competency Matrix for AI Engineers",
@@ -148,8 +176,8 @@ KEYWORD_TEMPLATES = {
     },
     "mods": {
         "topic": "Claude Code Mods: Interceptors, Tool Guardrails, and Plugin Architecture",
-        "level": "LEVEL 12: AGENT CLI & RUNTIME MODS",
-        "levelClass": "level-3",
+        "level": "Medium",
+        "levelClass": "level-medium",
         "readTime": "8 min read",
         "audience": "CLI Tool Builders, Security Architects & Principal Engineers",
         "title": "Claude Code Mods: Architecture, Lifecycle Interceptors, and Enterprise Tool Guardrails",
@@ -183,8 +211,8 @@ KEYWORD_TEMPLATES = {
     },
     "weight": {
         "topic": "Weight-Space Programming: Model Merging and Task Arithmetic",
-        "level": "LEVEL 23: WEIGHT-SPACE ENGINEERING & PARAMETER COMPOSITION",
-        "levelClass": "level-3",
+        "level": "Advanced",
+        "levelClass": "level-advanced",
         "readTime": "9 min read",
         "audience": "Principal AI Architects & Foundation Model Engineers",
         "title": "Weight-Space Programming: Composing Enterprise Model Capabilities via Task Arithmetic and TIES-Merging",
@@ -221,8 +249,8 @@ KEYWORD_TEMPLATES = {
 RESERVE_TOPICS_POOL = [
   {
     "topic": "Semantic Caching Architecture: Tiering Redis Vector Stores and Exact Prefix Hashing",
-    "level": "LEVEL 22: SEMANTIC CACHING & FINOPS",
-    "levelClass": "level-2",
+    "level": "Medium",
+    "levelClass": "level-medium",
     "readTime": "8 min read",
     "audience": "Systems Architects & Backend Engineers",
     "title": "Semantic Caching Architecture: Tiering Redis Vector Stores and Exact Prefix Hashing for Agentic Workflows",
@@ -256,8 +284,8 @@ RESERVE_TOPICS_POOL = [
   },
   {
     "topic": "Canary Honeytokens: Detecting and Severing Active Prompt Injections",
-    "level": "LEVEL 23: ADVERSARIAL DEFENSE & CANARIES",
-    "levelClass": "level-3",
+    "level": "Advanced",
+    "levelClass": "level-advanced",
     "readTime": "9 min read",
     "audience": "AI Security Engineers & DevSecOps Specialists",
     "title": "Canary Tokens in LLM Context: Deploying Honeytokens to Detect and Sever Active Prompt Injections",
@@ -291,8 +319,8 @@ RESERVE_TOPICS_POOL = [
   },
   {
     "topic": "Event Sourcing and Checkpointing in Agentic Architectures",
-    "level": "LEVEL 24: RESILIENT STATE MACHINES",
-    "levelClass": "level-3",
+    "level": "Advanced",
+    "levelClass": "level-advanced",
     "readTime": "10 min read",
     "audience": "Distributed Systems Engineers & Autonomous Systems Leads",
     "title": "Event Sourcing in Agentic Workflows: Implementing Checkpointing and Time-Travel Rollbacks for Claude Agents",
@@ -326,8 +354,8 @@ RESERVE_TOPICS_POOL = [
   },
   {
     "topic": "Idempotency Keys and Safe Mutation Retries for LLM Tool Execution",
-    "level": "LEVEL 25: DISTRIBUTED SYSTEMS & TOOL SAFETY",
-    "levelClass": "level-3",
+    "level": "Medium",
+    "levelClass": "level-medium",
     "readTime": "8 min read",
     "audience": "Backend Infrastructure Architects & Platform Engineers",
     "title": "Idempotency Keys in Agent Tool Execution: Preventing Duplicate Mutations in Distributed Swarms",
@@ -361,8 +389,8 @@ RESERVE_TOPICS_POOL = [
   },
   {
     "topic": "Speculative Orchestration: Draft Verification Pipelines",
-    "level": "LEVEL 26: SPECULATIVE DECODING & LATENCY OPTIMIZATION",
-    "levelClass": "level-3",
+    "level": "Advanced",
+    "levelClass": "level-advanced",
     "readTime": "9 min read",
     "audience": "Low-Latency Systems Architects & Performance Engineers",
     "title": "Speculative Orchestration: Pairing Claude 3.5 Haiku as Draft Model for Sonnet 3.7 to Halve Generation Latency",
@@ -549,8 +577,8 @@ Output ONLY valid JSON matching:
 {{
   "id": "post-X",
   "publishedAt": "YYYY-MM-DD HH:MM UTC",
-  "level": "LEVEL X: ...",
-  "levelClass": "level-3",
+  "level": "Easy, Medium, or Advanced (choose one based on complexity)",
+  "levelClass": "level-easy, level-medium, or level-advanced",
   "readTime": "8 min read",
   "audience": "Senior Engineers & Architects",
   "title": "...",
@@ -597,7 +625,9 @@ Output ONLY valid JSON matching:
             "stat_2": "Proper error boundaries eliminate cascading failures across downstream microservices.",
             "model_title": f"1. The 60-Second Mental Model: {custom_keyword} as an Enterprise Interface",
             "model_text": f"Just as we enforce contracts between microservices, applying {custom_keyword} to Claude workflows creates clear separation of concerns, deterministic boundaries, and observable state transitions.",
-            "badge": f"Deliberate architecture around {custom_keyword} ensures reliability at scale."
+            "badge": f"Deliberate architecture around {custom_keyword} ensures reliability at scale.",
+            "level": "Medium",
+            "levelClass": "level-medium"
         },
         {
             "title": f"Enterprise {custom_keyword}: Failure Domains and Telemetry Guardrails",
@@ -607,7 +637,9 @@ Output ONLY valid JSON matching:
             "stat_2": "End-to-end tracing pinpoints latency bottlenecks and eliminates redundant reasoning loops.",
             "model_title": f"1. The 60-Second Mental Model: {custom_keyword} as an Observability Gate",
             "model_text": f"Treat {custom_keyword} as an instrumented gateway: validate all inputs at the boundary, enforce strict execution timeouts, and isolate fault domains.",
-            "badge": "Resilient systems isolate failures before they propagate."
+            "badge": "Resilient systems isolate failures before they propagate.",
+            "level": "Advanced",
+            "levelClass": "level-advanced"
         },
         {
             "title": f"Optimizing {custom_keyword}: Concurrency and Cost Efficiency",
@@ -617,15 +649,17 @@ Output ONLY valid JSON matching:
             "stat_2": "Concurrent execution paths compress turn latency to the single slowest external call.",
             "model_title": f"1. The 60-Second Mental Model: {custom_keyword} as an Asynchronous Pipeline",
             "model_text": f"Do not process sequential dependencies linearly when {custom_keyword} operations can be executed concurrently. Decouple extraction from execution.",
-            "badge": "Intelligent orchestration delivers frontier performance at scale."
+            "badge": "Intelligent orchestration delivers frontier performance at scale.",
+            "level": "Medium",
+            "levelClass": "level-medium"
         }
     ]
     tpl = fallback_templates[abs(hash(custom_keyword)) % len(fallback_templates)]
     fallback = {
         "topic": custom_keyword,
         "publishedAt": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-        "level": f"DEEP-DIVE: {custom_keyword.upper()}",
-        "levelClass": "level-3",
+        "level": tpl.get("level", "Advanced"),
+        "levelClass": tpl.get("levelClass", "level-advanced"),
         "readTime": "8 min read",
         "audience": "Senior Engineering Community",
         "title": tpl["title"],

@@ -1,4 +1,4 @@
-# Helper script to queue a custom topic/keyword to upcoming_topics.json
+﻿# Helper script to queue a custom topic/keyword to upcoming_topics.json
 param (
     [Parameter(Mandatory=$true)]
     [string]$Topic
@@ -18,8 +18,8 @@ $upcoming = Get-Content $upcomingJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $newEntry = [PSCustomObject]@{
     id = "custom-$((Get-Date).Ticks)"
     topic = $Topic
-    level = "SPECIAL DISPATCH: $($Topic.ToUpper())"
-    levelClass = "level-3"
+    level = "Advanced"
+    levelClass = "level-advanced"
     readTime = "8 min read"
     audience = "Enterprise Engineers & Architects"
     title = "$Topic in Enterprise Claude Architecture"
