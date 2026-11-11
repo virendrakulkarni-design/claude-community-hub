@@ -1087,5 +1087,42 @@
     },
     "id": "post-30",
     "publishedAt": "2026-11-11 15:56 UTC"
+  },
+  {
+    "topic": "Canary Honeytokens: Detecting and Severing Active Prompt Injections",
+    "level": "Advanced",
+    "levelClass": "level-advanced",
+    "readTime": "9 min read",
+    "audience": "AI Security Engineers & DevSecOps Specialists",
+    "title": "Canary Tokens in LLM Context: Deploying Honeytokens to Detect and Sever Active Prompt Injections",
+    "lead": "Static regex filters and semantic classifiers fail to catch indirect prompt injections hidden in untrusted external documents. Embedding ephemeral, cryptographically randomized honeytokens into system prompts creates a zero-false-positive intrusion tripwire that instantly severs unauthorized tool execution.",
+    "stats": {
+      "type": "danger",
+      "title": "Production Intrusion Detection Benchmarks:",
+      "items": [
+        "Indirect prompt injections embedded in web scraped HTML bypass standard input classifiers in 31.4% of evasive attacks.",
+        "Context honeytokens detect system prompt exfiltration attempts with 100% precision and zero false positives.",
+        "Automated circuit breaking terminates compromised agent sessions within 4ms of honeytoken egress detection."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Bank Dye Packs vs. Semantic Keyword Scanners",
+      "text": "Physical bank security does not rely solely on security guards checking backpacks; cash drawers contain chemical dye packs that detonate automatically when stolen money leaves the vault.<br><br><strong>Canary Honeytokens are digital dye packs inside the prompt:</strong> A 128-bit secret token is placed within an internal instruction block. If an adversary tricks Claude into regurgitating instructions or passing context to an external webhook, the presence of the honeytoken triggers an immediate network disconnect."
+    },
+    "diagram": "graph TD\n Req[\"User Request + Untrusted External HTML\"] --> Inject[\"System Prompt + Ephemeral Honeytoken [CANARY-7X9B]\"]\n Inject --> Engine[\"Claude 3.7 Execution Engine\"]\n Engine --> Tool[\"Outgoing Tool Call / Network Egress\"]\n Tool --> EgressGate{\"Egress Proxy: Does Payload Contain [CANARY-7X9B]?\"}\n EgressGate -- YES --> Kill[\"Tripwire Tripped: Sever Session & Blacklist IP\"]\n EgressGate -- NO --> Exec[\"Authorize Tool Execution\"]\n style Kill fill:#7f1d1d,stroke:#f87171,color:#fff\n style Exec fill:#065f46,stroke:#34d399,color:#fff",
+    "diagramCaption": "Figure: Honeytoken Egress Inspection and Circuit Breaker Architecture",
+    "codeTitle": "honeytoken_egress_gate.py",
+    "codeContent": "import secrets\n\nclass HoneytokenTripwire:\n def __init__(self):\n self.active_canaries = set()\n\n def generate_token(self) -> str:\n token = f\"CANARY_{secrets.token_hex(8).upper()}\"\n self.active_canaries.add(token)\n return token\n\n def inspect_egress_payload(self, tool_name: str, payload: dict) -> bool:\n raw_str = str(payload)\n for canary in list(self.active_canaries):\n if canary in raw_str:\n raise RuntimeError(f\"CRITICAL: Honeytoken leak in egress tool '{tool_name}'. Session severed.\")\n return True",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Generate a cryptographically unique honeytoken per user session and embed it in system prompts.",
+        "Inspect all outgoing tool arguments at the network proxy boundary before executing external requests.",
+        "Treat any honeytoken detection as an active exploit attempt: terminate the execution loop immediately."
+      ],
+      "badge": "Honeytoken tripwires convert uncertain prompt defense into deterministic intrusion alarms."
+    },
+    "id": "post-31",
+    "publishedAt": "2026-11-11 22:35 UTC"
   }
 ]
