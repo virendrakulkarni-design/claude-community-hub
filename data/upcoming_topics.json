@@ -1,40 +1,5 @@
 [
   {
-    "topic": "Event Sourcing and Checkpointing in Agentic Architectures",
-    "level": "Medium",
-    "levelClass": "level-medium",
-    "readTime": "10 min read",
-    "audience": "Distributed Systems Engineers & Autonomous Systems Leads",
-    "title": "Event Sourcing in Agentic Workflows: Implementing Checkpointing and Time-Travel Rollbacks for Claude Agents",
-    "lead": "When a multi-step agent crashes or produces an unrecoverable hallucination on step 12 of a 15-step task, replaying the entire run wastes thousands of tokens and risks non-deterministic divergence. Structuring agent state as an immutable event stream enables atomic checkpointing, state rollbacks, and deterministic fault recovery.",
-    "stats": {
-      "type": "info",
-      "title": "Stateful Agent Resilience Benchmarks:",
-      "items": [
-        "Uncheckpointed agent loops discard an average of 48,000 prompt tokens whenever a downstream tool fails on late-stage iterations.",
-        "Delta event sourcing compresses saved agent state snapshots by 84% compared to full context memory dumps.",
-        "Atomic time-travel rollbacks recover from corrupted tool intermediate states in under 120ms without human intervention."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Git Commits vs. Destructive State Overwrites",
-      "text": "Traditional scripts update state in-place: variable X becomes variable Y, destroying previous values. When an unhandled exception occurs, the system cannot restore earlier invariants.<br><br><strong>Event Sourced Agents treat every action as an immutable commit:</strong> Rather than mutating a single global context object, the orchestrator appends signed state deltas. Recovering from an invalid tool call is as simple as reverting to commit N-1."
-    },
-    "diagram": "graph TD\n Init[\"Agent Session Initialized\"] --> E1[\"Event 1: User Goal Defined\"]\n E1 --> E2[\"Event 2: Schema Introspection Checkpointed\"]\n E2 --> E3[\"Event 3: Database Query Executed\"]\n E3 --> E4[\"Event 4: Tool Error / Malformed Schema\"]\n E4 --> Inspect{\"Evaluation Gate: Invariant Broken?\"}\n Inspect -- YES --> Rollback[\"Time Travel: Revert to Checkpoint 3\"]\n Rollback --> AltPath[\"Retry Alternative Reasoning Path\"]\n Inspect -- NO --> Commit[\"Append Valid State Delta\"]\n style Rollback fill:#b45309,stroke:#f59e0b,color:#fff\n style AltPath fill:#065f46,stroke:#34d399,color:#fff",
-    "diagramCaption": "Figure: Immutable Event Stream with Atomic Rollback Recovery",
-    "codeTitle": "agent_event_sourcing.py",
-    "codeContent": "from dataclasses import dataclass\nfrom typing import List, Dict, Any\nimport time\n\n@dataclass\nclass AgentEvent:\n step_index: int\n action_type: str\n payload: Dict[str, Any]\n timestamp: float = time.time()\n\nclass EventSourcedAgentState:\n def __init__(self):\n self.event_stream: List[AgentEvent] = []\n\n def append_event(self, action_type: str, payload: Dict[str, Any]):\n event = AgentEvent(len(self.event_stream), action_type, payload)\n self.event_stream.append(event)\n\n def rollback_to_step(self, target_step: int):\n self.event_stream = self.event_stream[:target_step + 1]",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Never mutate shared conversation state in-place across autonomous agent turns.",
-        "Persist intermediate step snapshots to an append-only datastore such as DynamoDB or PostgreSQL.",
-        "Implement automated rollback policies to unwind hallucinations before tool mutations touch production databases."
-      ],
-      "badge": "Event sourcing decouples agent execution from fragile transient memory."
-    }
-  },
-  {
     "topic": "Idempotency Keys and Safe Mutation Retries for LLM Tool Execution",
     "level": "Medium",
     "levelClass": "level-medium",
@@ -140,38 +105,73 @@
     }
   },
   {
-    "topic": "Canary Honeytokens: Detecting and Severing Active Prompt Injections",
-    "level": "Advanced",
-    "levelClass": "level-advanced",
-    "readTime": "9 min read",
-    "audience": "AI Security Engineers & DevSecOps Specialists",
-    "title": "Canary Tokens in LLM Context: Deploying Honeytokens to Detect and Sever Active Prompt Injections",
-    "lead": "Static regex filters and semantic classifiers fail to catch indirect prompt injections hidden in untrusted external documents. Embedding ephemeral, cryptographically randomized honeytokens into system prompts creates a zero-false-positive intrusion tripwire that instantly severs unauthorized tool execution.",
+    "topic": "Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads",
+    "publishedAt": "2026-11-12 03:20 UTC",
+    "level": "Medium",
+    "levelClass": "level-medium",
+    "readTime": "8 min read",
+    "audience": "Senior Engineering Community",
+    "title": "Optimizing Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads: Concurrency and Cost Efficiency",
+    "lead": "High-throughput deployments of Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads require hierarchical prompt structuring, prefix-aligned caching, and asynchronous fan-out concurrency.",
     "stats": {
-      "type": "danger",
-      "title": "Production Intrusion Detection Benchmarks:",
+      "type": "info",
+      "title": "FinOps Benchmarks for Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads:",
       "items": [
-        "Indirect prompt injections embedded in web scraped HTML bypass standard input classifiers in 31.4% of evasive attacks.",
-        "Context honeytokens detect system prompt exfiltration attempts with 100% precision and zero false positives.",
-        "Automated circuit breaking terminates compromised agent sessions within 4ms of honeytoken egress detection."
+        "Prefix-aligned prompt caching for Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads lowers steady-state token burn by up to 74%.",
+        "Concurrent execution paths compress turn latency to the single slowest external call."
       ]
     },
     "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Bank Dye Packs vs. Semantic Keyword Scanners",
-      "text": "Physical bank security does not rely solely on security guards checking backpacks; cash drawers contain chemical dye packs that detonate automatically when stolen money leaves the vault.<br><br><strong>Canary Honeytokens are digital dye packs inside the prompt:</strong> A 128-bit secret token is placed within an internal instruction block. If an adversary tricks Claude into regurgitating instructions or passing context to an external webhook, the presence of the honeytoken triggers an immediate network disconnect."
+      "title": "1. The 60-Second Mental Model: Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads as an Asynchronous Pipeline",
+      "text": "Do not process sequential dependencies linearly when Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads operations can be executed concurrently. Decouple extraction from execution."
     },
-    "diagram": "graph TD\n Req[\"User Request + Untrusted External HTML\"] --> Inject[\"System Prompt + Ephemeral Honeytoken [CANARY-7X9B]\"]\n Inject --> Engine[\"Claude 3.7 Execution Engine\"]\n Engine --> Tool[\"Outgoing Tool Call / Network Egress\"]\n Tool --> EgressGate{\"Egress Proxy: Does Payload Contain [CANARY-7X9B]?\"}\n EgressGate -- YES --> Kill[\"Tripwire Tripped: Sever Session & Blacklist IP\"]\n EgressGate -- NO --> Exec[\"Authorize Tool Execution\"]\n style Kill fill:#7f1d1d,stroke:#f87171,color:#fff\n style Exec fill:#065f46,stroke:#34d399,color:#fff",
-    "diagramCaption": "Figure: Honeytoken Egress Inspection and Circuit Breaker Architecture",
-    "codeTitle": "honeytoken_egress_gate.py",
-    "codeContent": "import secrets\n\nclass HoneytokenTripwire:\n def __init__(self):\n self.active_canaries = set()\n\n def generate_token(self) -> str:\n token = f\"CANARY_{secrets.token_hex(8).upper()}\"\n self.active_canaries.add(token)\n return token\n\n def inspect_egress_payload(self, tool_name: str, payload: dict) -> bool:\n raw_str = str(payload)\n for canary in list(self.active_canaries):\n if canary in raw_str:\n raise RuntimeError(f\"CRITICAL: Honeytoken leak in egress tool '{tool_name}'. Session severed.\")\n return True",
+    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Operational Pipeline for Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads",
+    "codeTitle": "enterprise_scaffold.py",
+    "codeContent": "# Architectural Implementation Scaffold for Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads\n# Enforce XML validation and structured contracts across execution boundaries.",
     "takeaway": {
       "title": "Key Takeaways",
       "items": [
-        "Generate a cryptographically unique honeytoken per user session and embed it in system prompts.",
-        "Inspect all outgoing tool arguments at the network proxy boundary before executing external requests.",
-        "Treat any honeytoken detection as an active exploit attempt: terminate the execution loop immediately."
+        "Integrate Multi-Tenant LLM Rate Limiting: Leaky Bucket Concurrency and Priority Queuing for Tiered Claude Workloads requirements directly into system prompts.",
+        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
+        "Review edge cases during PR reviews before moving to staging."
       ],
-      "badge": "Honeytoken tripwires convert uncertain prompt defense into deterministic intrusion alarms."
+      "badge": "Intelligent orchestration delivers frontier performance at scale."
+    }
+  },
+  {
+    "topic": "Event Sourcing and Checkpointing in Agentic Architectures",
+    "level": "Advanced",
+    "levelClass": "level-advanced",
+    "readTime": "10 min read",
+    "audience": "Distributed Systems Engineers & Autonomous Systems Leads",
+    "title": "Event Sourcing in Agentic Workflows: Implementing Checkpointing and Time-Travel Rollbacks for Claude Agents",
+    "lead": "When a multi-step agent crashes or produces an unrecoverable hallucination on step 12 of a 15-step task, replaying the entire run wastes thousands of tokens and risks non-deterministic divergence. Structuring agent state as an immutable event stream enables atomic checkpointing, state rollbacks, and deterministic fault recovery.",
+    "stats": {
+      "type": "info",
+      "title": "Stateful Agent Resilience Benchmarks:",
+      "items": [
+        "Uncheckpointed agent loops discard an average of 48,000 prompt tokens whenever a downstream tool fails on late-stage iterations.",
+        "Delta event sourcing compresses saved agent state snapshots by 84% compared to full context memory dumps.",
+        "Atomic time-travel rollbacks recover from corrupted tool intermediate states in under 120ms without human intervention."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Git Commits vs. Destructive State Overwrites",
+      "text": "Traditional scripts update state in-place: variable X becomes variable Y, destroying previous values. When an unhandled exception occurs, the system cannot restore earlier invariants.<br><br><strong>Event Sourced Agents treat every action as an immutable commit:</strong> Rather than mutating a single global context object, the orchestrator appends signed state deltas. Recovering from an invalid tool call is as simple as reverting to commit N-1."
+    },
+    "diagram": "graph TD\n Init[\"Agent Session Initialized\"] --> E1[\"Event 1: User Goal Defined\"]\n E1 --> E2[\"Event 2: Schema Introspection Checkpointed\"]\n E2 --> E3[\"Event 3: Database Query Executed\"]\n E3 --> E4[\"Event 4: Tool Error / Malformed Schema\"]\n E4 --> Inspect{\"Evaluation Gate: Invariant Broken?\"}\n Inspect -- YES --> Rollback[\"Time Travel: Revert to Checkpoint 3\"]\n Rollback --> AltPath[\"Retry Alternative Reasoning Path\"]\n Inspect -- NO --> Commit[\"Append Valid State Delta\"]\n style Rollback fill:#b45309,stroke:#f59e0b,color:#fff\n style AltPath fill:#065f46,stroke:#34d399,color:#fff",
+    "diagramCaption": "Figure: Immutable Event Stream with Atomic Rollback Recovery",
+    "codeTitle": "agent_event_sourcing.py",
+    "codeContent": "from dataclasses import dataclass\nfrom typing import List, Dict, Any\nimport time\n\n@dataclass\nclass AgentEvent:\n step_index: int\n action_type: str\n payload: Dict[str, Any]\n timestamp: float = time.time()\n\nclass EventSourcedAgentState:\n def __init__(self):\n self.event_stream: List[AgentEvent] = []\n\n def append_event(self, action_type: str, payload: Dict[str, Any]):\n event = AgentEvent(len(self.event_stream), action_type, payload)\n self.event_stream.append(event)\n\n def rollback_to_step(self, target_step: int):\n self.event_stream = self.event_stream[:target_step + 1]",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Never mutate shared conversation state in-place across autonomous agent turns.",
+        "Persist intermediate step snapshots to an append-only datastore such as DynamoDB or PostgreSQL.",
+        "Implement automated rollback policies to unwind hallucinations before tool mutations touch production databases."
+      ],
+      "badge": "Event sourcing decouples agent execution from fragile transient memory."
     }
   }
 ]
