@@ -815,8 +815,8 @@ def main():
                 sys.exit(0)
             post_to_publish = upcoming.pop(0)
 
-        # Immediately replenish after popping so queue ALWAYS maintains 5 items remaining
-        upcoming = replenish_queue_if_low(upcoming, posts, target_count=5)
+        # Immediately replenish after popping, ensuring post_to_publish is treated as already published
+        upcoming = replenish_queue_if_low(upcoming, posts + [post_to_publish], target_count=5)
 
     post_to_publish = humanize_post(post_to_publish)
     post_to_publish["id"] = f"post-{len(posts) + 1}"
@@ -841,6 +841,7 @@ def main():
     posts.append(post_to_publish)
     save_json(POSTS_JSON, posts)
     sync_posts_js(posts)
+    upcoming = replenish_queue_if_low(upcoming, posts, target_count=5)
     save_json(UPCOMING_JSON, upcoming)
 
     print(f"Published '{post_to_publish['title']}' successfully!")
