@@ -1,9 +1,9 @@
-name: 5-Minute Claude Architectural Publisher
+name: Claude Architectural Publisher
 
 on:
   schedule:
-    # Runs every 5 minutes
-    - cron: '*/5 * * * *'
+    # Runs 3 times a day (every 8 hours at 00:00, 08:00, 16:00 UTC)
+    - cron: '0 0,8,16 * * *'
   workflow_dispatch:
     inputs:
       custom_topic:

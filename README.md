@@ -19,14 +19,14 @@ All post generation adheres to the **Humanizer Skill** located in [`skills/human
 
 ---
 
-## Automated Scheduling (8:30 AM IST / 03:00 UTC)
+## Automated Scheduling (3 Dispatches Daily: 00:00, 08:00, 16:00 UTC)
 
 This repository is equipped with an automated pipeline to publish new posts on schedule:
 
-- **Schedule Time:** `0 3 * * *` (03:00 UTC = 8:30 AM IST).
+- **Schedule Frequency:** 3 times daily (`0 0,8,16 * * *` at 00:00, 08:00, and 16:00 UTC).
 - **Automation Runner:** [`.github/workflows/schedule_post.yml`](.github/workflows/schedule_post.yml)
-- **Generation Script:** [`scripts/generate_post.py`](scripts/generate_post.py) (Cross-platform Python) & [`scripts/generate_post.ps1`](scripts/generate_post.ps1) (Windows PowerShell).
-- **Topic Backlog:** Stored in [`data/upcoming_topics.json`](data/upcoming_topics.json) (covering Loop Engineering, MCP, Citations API, Computer Use, and Streaming Tool Calling).
+- **Generation Script:** [`scripts/generate_post.py`](scripts/generate_post.py).
+- **Topic Backlog:** Stored in [`data/upcoming_topics.json`](data/upcoming_topics.json).
 
 ---
 
