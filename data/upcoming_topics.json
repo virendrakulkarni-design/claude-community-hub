@@ -1,40 +1,5 @@
 [
   {
-    "topic": "Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning",
-    "publishedAt": "2026-11-12 03:31 UTC",
-    "level": "Advanced",
-    "levelClass": "level-advanced",
-    "readTime": "8 min read",
-    "audience": "Senior Engineering Community",
-    "title": "Enterprise Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning: Failure Domains and Telemetry Guardrails",
-    "lead": "Deploying Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning in mission-critical agentic systems requires telemetry-backed guardrails, structured reflection, and strict execution timeouts.",
-    "stats": {
-      "type": "info",
-      "title": "Reliability Benchmarks for Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning:",
-      "items": [
-        "Automated state checks around Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning intercept 99.2% of malformed payloads before database mutations.",
-        "End-to-end tracing pinpoints latency bottlenecks and eliminates redundant reasoning loops."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning as an Observability Gate",
-      "text": "Treat Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning as an instrumented gateway: validate all inputs at the boundary, enforce strict execution timeouts, and isolate fault domains."
-    },
-    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
-    "diagramCaption": "Figure: Operational Pipeline for Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning",
-    "codeTitle": "enterprise_scaffold.py",
-    "codeContent": "# Architectural Implementation Scaffold for Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning\n# Enforce XML validation and structured contracts across execution boundaries.",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Integrate Constitutional Data Distillation: Filtering and Formatting Claude Reasoning Traces for Domain Fine-Tuning requirements directly into system prompts.",
-        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
-        "Review edge cases during PR reviews before moving to staging."
-      ],
-      "badge": "Resilient systems isolate failures before they propagate."
-    }
-  },
-  {
     "topic": "Blue-Green Prompt Engineering: Shadow Routing and Canary Testing for Mission-Critical Claude Deployments",
     "publishedAt": "2026-11-12 03:33 UTC",
     "level": "Medium",
@@ -168,6 +133,41 @@
       "title": "Key Takeaways",
       "items": [
         "Integrate Deterministic Prompt Fuzzing: Grammar-Based Generation of Adversarial Edge Cases requirements directly into system prompts.",
+        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
+        "Review edge cases during PR reviews before moving to staging."
+      ],
+      "badge": "Intelligent orchestration delivers frontier performance at scale."
+    }
+  },
+  {
+    "topic": "Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services",
+    "publishedAt": "2026-11-13 21:43 UTC",
+    "level": "Medium",
+    "levelClass": "level-medium",
+    "readTime": "8 min read",
+    "audience": "Senior Engineering Community",
+    "title": "Optimizing Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services: Concurrency and Cost Efficiency",
+    "lead": "High-throughput deployments of Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services require hierarchical prompt structuring, prefix-aligned caching, and asynchronous fan-out concurrency.",
+    "stats": {
+      "type": "info",
+      "title": "FinOps Benchmarks for Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services:",
+      "items": [
+        "Prefix-aligned prompt caching for Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services lowers steady-state token burn by up to 74%.",
+        "Concurrent execution paths compress turn latency to the single slowest external call."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services as an Asynchronous Pipeline",
+      "text": "Do not process sequential dependencies linearly when Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services operations can be executed concurrently. Decouple extraction from execution."
+    },
+    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Operational Pipeline for Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services",
+    "codeTitle": "enterprise_scaffold.py",
+    "codeContent": "# Architectural Implementation Scaffold for Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services\n# Enforce XML validation and structured contracts across execution boundaries.",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Integrate Stateful Session Compaction: Delta-Encoding Conversation Histories across Stateless Services requirements directly into system prompts.",
         "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
         "Review edge cases during PR reviews before moving to staging."
       ],
