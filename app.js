@@ -535,9 +535,7 @@ function copyDiagram(postId) {
 }
 
 function stripHtml(html) {
-  const tmp = document.createElement("DIV");
-  tmp.innerHTML = html;
-  return tmp.textContent || tmp.innerText || "";
+  return (html || "").replace(/<[^>]*>/g, "");
 }
 
 function escapeHtml(text) {
@@ -578,70 +576,29 @@ function initTheme() {
  * and visible for more than 3.5 seconds (3-4 second dwell threshold).
  * Handles tab visibility, window blur/focus, and single-page dispatch navigation.
  */
-const DWELL_THRESHOLD_MS = 3500; // 3.5 seconds dwell engagement
+const DWELL_THRESHOLD_MS = 3500;
 let dwellTimer = null;
-let dwellStartTime = 0;
-let accumulatedDwellMs = 0;
-let postImpressionLogged = {};
+const postImpressionLogged = {};
 
 function initVisitorTracking() {
   startDwellTracker();
-
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
-      resumeDwellTracker();
+      startDwellTracker();
     } else {
-      pauseDwellTracker();
+      clearTimeout(dwellTimer);
     }
   });
-
-  window.addEventListener('focus', resumeDwellTracker);
-  window.addEventListener('blur', pauseDwellTracker);
 }
 
 function startDwellTracker() {
-  const currentPost = allPosts[currentIndex];
-  if (!currentPost) return;
-  const postId = currentPost.id;
-
   clearTimeout(dwellTimer);
-  dwellStartTime = (document.visibilityState === 'visible') ? Date.now() : 0;
-  accumulatedDwellMs = 0;
-
-  if (postImpressionLogged[postId]) {
-    // Already logged for this dispatch in this session; keep current badge displayed
-    return;
-  }
-
-  if (document.visibilityState === 'visible') {
-    dwellTimer = setTimeout(() => {
-      onDwellThresholdReached(postId);
-    }, DWELL_THRESHOLD_MS);
-  }
-}
-
-function pauseDwellTracker() {
-  if (dwellStartTime > 0) {
-    accumulatedDwellMs += (Date.now() - dwellStartTime);
-    dwellStartTime = 0;
-  }
-  clearTimeout(dwellTimer);
-}
-
-function resumeDwellTracker() {
   const currentPost = allPosts[currentIndex];
-  if (!currentPost) return;
-  const postId = currentPost.id;
-  if (postImpressionLogged[postId]) return;
+  if (!currentPost || postImpressionLogged[currentPost.id] || document.visibilityState !== 'visible') return;
 
-  if (document.visibilityState === 'visible' && dwellStartTime === 0) {
-    dwellStartTime = Date.now();
-    clearTimeout(dwellTimer);
-    const remainingMs = Math.max(150, DWELL_THRESHOLD_MS - accumulatedDwellMs);
-    dwellTimer = setTimeout(() => {
-      onDwellThresholdReached(postId);
-    }, remainingMs);
-  }
+  dwellTimer = setTimeout(() => {
+    onDwellThresholdReached(currentPost.id);
+  }, DWELL_THRESHOLD_MS);
 }
 
 function onDwellThresholdReached(postId) {

@@ -586,23 +586,19 @@ body.light-theme .top-nav {
   border: 1px solid transparent;
 }
 
-.sidebar-item-level.level-easy,
-.sidebar-item-level.level-1 {
+.sidebar-item-level.level-easy {
   background: rgba(56, 189, 248, 0.12);
   color: #38bdf8;
   border-color: rgba(56, 189, 248, 0.25);
 }
 
-.sidebar-item-level.level-medium,
-.sidebar-item-level.level-2 {
+.sidebar-item-level.level-medium {
   background: rgba(251, 191, 36, 0.12);
   color: #fbbf24;
   border-color: rgba(251, 191, 36, 0.25);
 }
 
-.sidebar-item-level.level-advanced,
-.sidebar-item-level.level-3,
-.sidebar-item-level.level-4 {
+.sidebar-item-level.level-advanced {
   background: rgba(248, 113, 113, 0.12);
   color: #f87171;
   border-color: rgba(248, 113, 113, 0.25);
@@ -752,15 +748,11 @@ body.light-theme .top-nav {
   letter-spacing: 0.02em;
 }
 
-.meta-pill.meta-level.level-easy,
-.meta-pill.meta-level.level-1 { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
+.meta-pill.meta-level.level-easy { background: rgba(56, 189, 248, 0.12); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
 
-.meta-pill.meta-level.level-medium,
-.meta-pill.meta-level.level-2 { background: rgba(251, 191, 36, 0.12); color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); }
+.meta-pill.meta-level.level-medium { background: rgba(251, 191, 36, 0.12); color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); }
 
-.meta-pill.meta-level.level-advanced,
-.meta-pill.meta-level.level-3,
-.meta-pill.meta-level.level-4 { background: rgba(248, 113, 113, 0.12); color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
+.meta-pill.meta-level.level-advanced { background: rgba(248, 113, 113, 0.12); color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
 
 .meta-pill.meta-latest {
   font-weight: 700;
