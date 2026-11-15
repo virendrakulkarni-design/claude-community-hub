@@ -1,40 +1,5 @@
 [
   {
-    "topic": "Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude",
-    "publishedAt": "2026-11-14 03:54 UTC",
-    "level": "Advanced",
-    "levelClass": "level-advanced",
-    "readTime": "8 min read",
-    "audience": "Senior Engineering Community",
-    "title": "Enterprise Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude: Failure Domains and Telemetry Guardrails",
-    "lead": "Deploying Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude in mission-critical agentic systems requires telemetry-backed guardrails, structured reflection, and strict execution timeouts.",
-    "stats": {
-      "type": "info",
-      "title": "Reliability Benchmarks for Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude:",
-      "items": [
-        "Automated state checks around Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude intercept 99.2% of malformed payloads before database mutations.",
-        "End-to-end tracing pinpoints latency bottlenecks and eliminates redundant reasoning loops."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude as an Observability Gate",
-      "text": "Treat Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude as an instrumented gateway: validate all inputs at the boundary, enforce strict execution timeouts, and isolate fault domains."
-    },
-    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
-    "diagramCaption": "Figure: Operational Pipeline for Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude",
-    "codeTitle": "enterprise_scaffold.py",
-    "codeContent": "# Architectural Implementation Scaffold for Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude\n# Enforce XML validation and structured contracts across execution boundaries.",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Integrate Zero-Data-Retention Pipelines: Cryptographic Enclaves and Private Inference for Claude requirements directly into system prompts.",
-        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
-        "Review edge cases during PR reviews before moving to staging."
-      ],
-      "badge": "Resilient systems isolate failures before they propagate."
-    }
-  },
-  {
     "topic": "Tool Execution Sandboxing: gVisor and WebAssembly Containers for Untrusted LLM Code",
     "publishedAt": "2026-11-14 14:36 UTC",
     "level": "Medium",
@@ -172,6 +137,41 @@
         "Review edge cases during PR reviews before moving to staging."
       ],
       "badge": "Deliberate architecture around Multi-Modal Document Parsing: Layout-Aware Vision Pipeline for PDF Ingestion at Scale ensures reliability at scale."
+    }
+  },
+  {
+    "topic": "Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases",
+    "publishedAt": "2026-11-15 20:39 UTC",
+    "level": "Medium",
+    "levelClass": "level-medium",
+    "readTime": "8 min read",
+    "audience": "Senior Engineering Community",
+    "title": "Architecting for Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases: Production Systems Design",
+    "lead": "Scaling Claude applications with Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases introduces explicit architectural boundaries across latency, prompt cache efficiency, and deterministic validation.",
+    "stats": {
+      "type": "info",
+      "title": "Production Telemetry for Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases:",
+      "items": [
+        "Adopting structured patterns for Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases lowers runtime defect rates by over 45%.",
+        "Proper error boundaries eliminate cascading failures across downstream microservices."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases as an Enterprise Interface",
+      "text": "Just as we enforce contracts between microservices, applying Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases to Claude workflows creates clear separation of concerns, deterministic boundaries, and observable state transitions."
+    },
+    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Operational Pipeline for Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases",
+    "codeTitle": "enterprise_scaffold.py",
+    "codeContent": "# Architectural Implementation Scaffold for Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases\n# Enforce XML validation and structured contracts across execution boundaries.",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Integrate Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases requirements directly into system prompts.",
+        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
+        "Review edge cases during PR reviews before moving to staging."
+      ],
+      "badge": "Deliberate architecture around Vector Index Compaction: Pruning Stale Chunk Embeddings in High-Velocity Knowledge Bases ensures reliability at scale."
     }
   }
 ]
