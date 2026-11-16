@@ -1,40 +1,5 @@
 [
   {
-    "topic": "Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification",
-    "publishedAt": "2026-11-14 20:13 UTC",
-    "level": "Medium",
-    "levelClass": "level-medium",
-    "readTime": "8 min read",
-    "audience": "Senior Engineering Community",
-    "title": "Architecting for Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification: Production Systems Design",
-    "lead": "Scaling Claude applications with Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification introduces explicit architectural boundaries across latency, prompt cache efficiency, and deterministic validation.",
-    "stats": {
-      "type": "info",
-      "title": "Production Telemetry for Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification:",
-      "items": [
-        "Adopting structured patterns for Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification lowers runtime defect rates by over 45%.",
-        "Proper error boundaries eliminate cascading failures across downstream microservices."
-      ]
-    },
-    "mentalModel": {
-      "title": "1. The 60-Second Mental Model: Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification as an Enterprise Interface",
-      "text": "Just as we enforce contracts between microservices, applying Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification to Claude workflows creates clear separation of concerns, deterministic boundaries, and observable state transitions."
-    },
-    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
-    "diagramCaption": "Figure: Operational Pipeline for Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification",
-    "codeTitle": "enterprise_scaffold.py",
-    "codeContent": "# Architectural Implementation Scaffold for Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification\n# Enforce XML validation and structured contracts across execution boundaries.",
-    "takeaway": {
-      "title": "Key Takeaways",
-      "items": [
-        "Integrate Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification requirements directly into system prompts.",
-        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
-        "Review edge cases during PR reviews before moving to staging."
-      ],
-      "badge": "Deliberate architecture around Adaptive Reasoning Budgets: Dynamic Thinking Token Allocation for Complex Verification ensures reliability at scale."
-    }
-  },
-  {
     "topic": "Cascading Fallbacks: Circuit Breakers and Graceful Degradation for Frontier LLMs",
     "publishedAt": "2026-11-15 03:38 UTC",
     "level": "Medium",
@@ -172,6 +137,41 @@
         "Review edge cases during PR reviews before moving to staging."
       ],
       "badge": "Resilient systems isolate failures before they propagate."
+    }
+  },
+  {
+    "topic": "Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms",
+    "publishedAt": "2026-11-16 17:39 UTC",
+    "level": "Medium",
+    "levelClass": "level-medium",
+    "readTime": "8 min read",
+    "audience": "Senior Engineering Community",
+    "title": "Optimizing Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms: Concurrency and Cost Efficiency",
+    "lead": "High-throughput deployments of Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms require hierarchical prompt structuring, prefix-aligned caching, and asynchronous fan-out concurrency.",
+    "stats": {
+      "type": "info",
+      "title": "FinOps Benchmarks for Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms:",
+      "items": [
+        "Prefix-aligned prompt caching for Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms lowers steady-state token burn by up to 74%.",
+        "Concurrent execution paths compress turn latency to the single slowest external call."
+      ]
+    },
+    "mentalModel": {
+      "title": "1. The 60-Second Mental Model: Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms as an Asynchronous Pipeline",
+      "text": "Do not process sequential dependencies linearly when Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms operations can be executed concurrently. Decouple extraction from execution."
+    },
+    "diagram": "graph LR\n Input[\"Client Context\"] --> Process[\"Claude Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms Processor\"]\n Process --> Output[\"Validated Result\"]\n style Process fill:#1e3a8a,stroke:#60a5fa,color:#fff",
+    "diagramCaption": "Figure: Operational Pipeline for Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms",
+    "codeTitle": "enterprise_scaffold.py",
+    "codeContent": "# Architectural Implementation Scaffold for Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms\n# Enforce XML validation and structured contracts across execution boundaries.",
+    "takeaway": {
+      "title": "Key Takeaways",
+      "items": [
+        "Integrate Distributed Trace Propagation: OpenTelemetry Context Injection across Agent Swarms requirements directly into system prompts.",
+        "Add telemetry markers to trace performance and failure modes in Datadog/Splunk.",
+        "Review edge cases during PR reviews before moving to staging."
+      ],
+      "badge": "Intelligent orchestration delivers frontier performance at scale."
     }
   }
 ]
